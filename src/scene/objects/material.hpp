@@ -82,7 +82,7 @@ namespace RT_CPU
 
             float reflectivity = 1.f-(1.f-_metalness)*(1.f-F);
 
-            if (randomFloat() <= reflectivity) {
+            if (randomFloat() <= reflectivity || glm::length(glm::refract(p_ray.getDirection(), H, p_ni / p_no))==0.f) {
                 Ray reflectRay = Ray(p_hitRecord._point, glm::normalize(glm::reflect(p_ray.getDirection(), H)));
                 reflectRay.offset(p_hitRecord._normal);
 
