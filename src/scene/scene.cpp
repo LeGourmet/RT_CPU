@@ -98,11 +98,11 @@ namespace RT_CPU
 			_camera = new CameraPerspective(Vec3f(-3.f, -2.f, 1.8f), Vec3f(-1.f, 0.f, 1.f), PIf / 3.f, 1.f, aspectRatio);
 			_lights.push_back(new SphereLight(Vec3f(0.f, 0.f, 2.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 0.5f, 30.f, 6));
 			_materials.push_back(new Material(Vec3f(0.5f, 0.5f, 0.5f), VEC3F_ZERO, 0.f, 0.f, 1.f, 0.f));
-			_loadGltf("assets/conference.gltf");
+			_loadGltf("assets/conference.glb");
 		}else if(p_id == 4) {
 			_camera = new CameraPerspective(Vec3f(-2.5f, -0.8f, 1.3f), Vec3f(1.f, 0.f, 1.f), PIf/3.f, 1.f, aspectRatio);
 			_materials.push_back(new Material(Vec3f(0.5f, 0.5f, 0.5f), VEC3F_ZERO, 0.f, 0.f, 1.f, 0.f));
-			_loadGltf("assets/conference_dragon_and_bunny.gltf");
+			_loadGltf("assets/conference_dragon_and_bunny.glb");
 		}
 
 		_bvh.build(&_objects);
