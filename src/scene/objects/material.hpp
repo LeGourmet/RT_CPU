@@ -44,7 +44,7 @@ namespace RT_CPU
             // ------------ DIELECTRIC ------------
             float f90 = _roughness * (2.f * cosHL * cosHL + 0.5f);
             Vec3f dielectric = _baseColor * schlick(1.f, f90, cosNL)* schlick(1.f, f90, cosNV)* (1.f - _roughness * 0.51f / 1.51f) / PIf;
-            if (p_pdfWeighted) dielectric /= INV_PIf;
+            if (p_pdfWeighted) dielectric /= cosNL*INV_PIf;
 
             return glm::mix(dielectric, conductor, _metalness) * cosNL;
         }
