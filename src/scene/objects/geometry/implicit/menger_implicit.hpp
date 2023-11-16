@@ -10,8 +10,10 @@ namespace RT_CPU
 	public:
 		MengerImplicit(const Vec3f p_center, const Vec3f p_bound)
 			: ObjectImplicit(p_center), _bound(p_bound) {
-			_aabb.extend(p_center + p_bound);
-			_aabb.extend(p_center - p_bound);
+			//_aabb.extend(p_center + p_bound);
+			//_aabb.extend(p_center - p_bound);
+			_aabb.extend(Vec3f(FLT_MAX));
+			_aabb.extend(Vec3f(-FLT_MAX));
 		}
 		~MengerImplicit() { }
 

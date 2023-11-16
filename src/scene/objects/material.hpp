@@ -25,7 +25,7 @@ namespace RT_CPU
         inline const Vec3f getEmissivity() const { return _emissiveColor*_emissiveStrength; }
 
         Vec3f evaluateBRDF(const Vec3f& V, const Vec3f& N, const Vec3f& H, const Vec3f& L, bool p_pdfWeighted){
-            float cosNV = glm::dot(N, V); // max 1e-5f avoid artefacts ?
+            float cosNV = glm::max(1e-5f,glm::dot(N, V)); // max 1e-5f avoid artefacts
             float cosNL = glm::dot(N, L);
             float cosHN = glm::dot(H, N);
             float cosHL = glm::dot(H, L); float cosHV = glm::dot(H, V);
@@ -50,7 +50,7 @@ namespace RT_CPU
         }
 
         Vec3f evaluateBTDF(const Vec3f& V, const Vec3f& N, const Vec3f& H, const Vec3f& L, float p_ni, float p_no ,bool p_pdfWeighted) {
-            float cosNV = glm::abs(glm::dot(N, V)); // max 1e-5f avoid artefacts ?
+            float cosNV = glm::max(1e-5f,glm::abs(glm::dot(N, V))); // max 1e-5f avoid artefacts
             float cosNL = glm::dot(N, L);
             float cosHN = glm::dot(H, N);
             float cosHL = glm::dot(H, L);
@@ -60,12 +60,9 @@ namespace RT_CPU
             float r2 = r * r;
             
             if (p_pdfWeighted) {
-                float G1L = (2.f * cosNL) / glm::max(1e-5f, (cosNL + glm::sqrt((cosNL - cosNL * r2) * cosNL + r2)));
-                float G1V = (2.f * cosNV) / glm::max(1e-5f, (cosNV + glm::sqrt((cosNV - cosNV * r2) * cosNV + r2)));
-                float LaL = 0.5f*(glm::sqrt(r2+(1.f-r2)*cosNL*cosNL)/cosNL-1.f);
-                float LaV = 0.5f*(glm::sqrt(r2+(1.f-r2)*cosNV*cosNV)/cosNV-1.f);
-                float G2 = G1L*G1V/glm::max(1e-5f,1.f+LaL+LaV);
-                return _baseColor * G2 / glm::max(1e-5f,G1V); // approx => _baseColor * G1L
+                float tmpV = glm::sqrt(r2+(1.f-r2)*cosNV*cosNV);
+                float tmpL = glm::sqrt(r2+(1.f-r2)*cosNL*cosNL);
+                return _baseColor*2.f*cosNL / glm::max(1e-5f, (cosNL+tmpL)*(1.f+0.5f*(tmpL/cosNL-1.f)+0.5f*(tmpV/cosNV-1.f)));
             }
 
             //float g = glm::sqrt(glm::max(0.f,pow2(p_no/p_ni)-1.f+cosHV*cosHV)); // !0 wtf
@@ -78,11 +75,10 @@ namespace RT_CPU
         Ray evaluateBSDF(const Ray& p_ray, const HitRecord& p_hitRecord, float p_ni, float p_no, Vec3f& p_rayColor) {
            Vec3f H = sampleGGXVNDF(-p_ray.getDirection(),p_hitRecord._normal,_roughness,_roughness);
 
-            float F = schlick(fresnel(p_ni, p_no), 1.f, glm::dot(p_hitRecord._normal, -p_ray.getDirection()));
-
-            float reflectivity = 1.f-(1.f-_metalness)*(1.f-F);
-
-            if (randomFloat() <= reflectivity || glm::length(glm::refract(p_ray.getDirection(), H, p_ni / p_no))==0.f) {
+            float F = schlick(fresnel(p_ni, p_no), 1.f, glm::dot(p_hitRecord._normal,-p_ray.getDirection()));
+            float reflectivity = 1.f-/*_transmitness**/(1.f-_metalness)*(1.f-F);
+            
+            if (randomFloat() <= reflectivity || glm::length(glm::refract(p_ray.getDirection(), H, p_ni/p_no))==0.f) {
                 Ray reflectRay = Ray(p_hitRecord._point, glm::normalize(glm::reflect(p_ray.getDirection(), H)));
                 reflectRay.offset(p_hitRecord._normal);
 
@@ -120,22 +116,13 @@ namespace RT_CPU
         }
 
         Vec3f sampleGGXVNDF(Vec3f V, Vec3f N, float rx, float ry) {
-            Vec3f T, B;
-            if (N.z < 0.f) {
-                float a = 1.f / (1.f - N.z);
-                float b = N.x * N.y * a;
-                T = Vec3f(1.f - N.x * N.x * a, -b, N.x);
-                B = Vec3f(b, N.y * N.y * a - 1.f, -N.y);
-            }
-            else {
-                float a = 1.f / (1.f + N.z);
-                float b = -N.x * N.y * a;
-                T = Vec3f(1.f - N.x * N.x * a, b, -N.x);
-                B = Vec3f(b, 1.f - N.y * N.y * a, -N.y);
-            }
+            float s = (N.z>=0.) ? 1.f : -1.f;
+            float a = -1.f/(s+N.z);
+            float b = N.x*N.y*a;
+            Vec3f T = Vec3f(1.f+s*N.x*N.x*a, s*b, -s*N.x);
+            Vec3f B = Vec3f(b, s+N.y*N.y*a, -N.y);
 
             V = Vec3f(glm::dot(V, T), glm::dot(V, B), glm::dot(V, N));
-
             Vec3f Vh = glm::normalize(V * Vec3f(rx, ry, 1.f));
 
             float phi = TWO_PIf * randomFloat();
@@ -151,6 +138,7 @@ namespace RT_CPU
         // ----------------------------------------------------- ATTRIBUTS -----------------------------------------------------
         Vec3f _baseColor = VEC3F_ONE;
         Vec3f _emissiveColor = VEC3F_ZERO;
+        // float transmitness
 
         float _emissiveStrength = 0.f;
         float _metalness = 0.f;
