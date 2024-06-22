@@ -42,12 +42,12 @@ namespace RT_CPU
 			_objects.push_back(new Plane(Vec3f(0.f, 0.f, 0.f), Vec3f(0., 0., 1.f)));
 			_objects.push_back(new Sphere(Vec3f(0.f, 0.f, 100.f), 30.f));
 			
-			_materials.push_back(new Material(Vec3f(0.5f, 0.5f, 0.5f), VEC3F_ZERO, 0.f, 0.f, 1.f, 0.f));
-			_materials.push_back(new Material(Vec3f(1.f, 1.f, 1.f), VEC3F_ONE, 100.f, 0.f, 1.f, 0.f));
+			_materials.push_back(new Material(Vec3f(0.5f, 0.5f, 0.5f), VEC3F_ZERO, 0.f, 0.f, 1.f, 0.f, 1.f));
+			_materials.push_back(new Material(Vec3f(1.f, 1.f, 1.f), VEC3F_ONE, 10.f, 0.f, 1.f, 0.f, 1.f));
 			
 			for(int i=0; i<5 ;i++)
 				for(int j=0; j<5 ;j++){
-					_materials.push_back(new Material(Vec3f(randomFloat(), randomFloat(), randomFloat()), VEC3F_ZERO, 0.f, 0.f, 0.f, 1.5f));
+					_materials.push_back(new Material(Vec3f(randomFloat(), randomFloat(), randomFloat()), VEC3F_ZERO, 0.f, 0.f, 0.f, 0.f, 1.5f));
 					_objects.push_back(new Sphere(Vec3f(-5.f + i * 2.5f, -5.f + j * 2.5f, 2.f), 1.f));
 				}
 
@@ -57,12 +57,12 @@ namespace RT_CPU
 		}else if(p_id==1){
 			_camera = new CameraPerspective(Vec3f(0.f, -3.f, 2.5f), Vec3f(0.f, 0.f, 1.f), PIf / 3.f, 1.f, aspectRatio);
 
-			_materials.push_back(new Material(Vec3f(1.f, 1.f, 1.f), VEC3F_ONE, 20.f, 0.f, 1.f, 0.f));
-			_materials.push_back(new Material(Vec3f(0.9f, 0.9f, 0.9f), VEC3F_ZERO, 0.f, 0.f, 0.6f, 0.f));
-			_materials.push_back(new Material(Vec3f(1.f, 0.f, 0.f), VEC3F_ZERO, 0.f, 0.f, 0.6f, 0.f));
-			_materials.push_back(new Material(Vec3f(0.f, 1.f, 0.f), VEC3F_ZERO, 0.f, 0.f, 0.6f, 0.f));
-			_materials.push_back(new Material(Vec3f(0.8f, 0.235f, 0.f), VEC3F_ZERO, 0.f, 0.9f, 0.5f, 0.f));
-			_materials.push_back(new Material(Vec3f(0.f, 0.235f, 0.8f), VEC3F_ZERO, 0.f, 0.9f, 0.5f, 0.f));
+			_materials.push_back(new Material(Vec3f(1.f, 1.f, 1.f)    , VEC3F_ONE , 5.f, 0.f, 1.f, 0.f, 1.f));
+			_materials.push_back(new Material(Vec3f(1.f, 1.f, 1.f) , VEC3F_ZERO, 0.f, 0.f, 1.f, 0.f, 1.f));
+			_materials.push_back(new Material(Vec3f(1.f, 0.f, 0.f)    , VEC3F_ZERO, 0.f, 0.f, 1.f, 0.f, 1.f));
+			_materials.push_back(new Material(Vec3f(0.f, 1.f, 0.f)    , VEC3F_ZERO, 0.f, 0.f, 1.f, 0.f, 1.f));
+			_materials.push_back(new Material(Vec3f(0.8f, 0.235f, 0.f), VEC3F_ZERO, 0.f, 0.f, 0.f, 0.f, 1.f));
+			_materials.push_back(new Material(Vec3f(0.f, 0.235f, 0.8f), VEC3F_ZERO, 0.f, 0.f, 0.f, 0.f, 1.f));
 			
 			_objects.push_back(new Sphere(Vec3f(0.f, 0.f, 10.f), 3.f));
 			_objects.push_back(new Plane(Vec3f(0.f, 0.f, 0.f), Vec3f(0.f, 0.f, 1.f)));
@@ -86,10 +86,10 @@ namespace RT_CPU
 		} else if (p_id == 2) {
 			_camera = new CameraPerspective(Vec3f(-3.f, 0.f, 5.f), Vec3f(-3.f, -1.f, 5.f), PIf / 3.f, 1.f, aspectRatio);
 
-			_materials.push_back(new Material(Vec3f(1.f, 1.f, 1.f), VEC3F_ONE, 20.f, 0.f, 1.f, 0.f));
-			_materials.push_back(new Material(Vec3f(0.53f, 0.3f, 0.075f), VEC3F_ZERO, 0.f, 0.9f, 0.5f, 0.f));
+			_materials.push_back(new Material(Vec3f(1.f, 1.f, 1.f), VEC3F_ONE, 20.f, 0.f, 1.f, 0.f, 1.f));
+			_materials.push_back(new Material(Vec3f(0.53f, 0.3f, 0.075f), VEC3F_ZERO, 0.f, 0.9f, 0.5f, 0.f, 1.f));
 
-			_objects.push_back(new PlaneImplicit(Vec3f(0.f, 0.f, 10.f), Vec3f(0.f,0.f,-1.f)));
+			_objects.push_back(new Plane(Vec3f(0.f, 0.f, 10.f), Vec3f(0.f,0.f,-1.f)));
 			_objects.push_back(new AppoloniusImplicit(Vec3f(0.f, 0.f, 0.f)));
 
 			for (int i = 0; i < _objects.size();i++)
@@ -97,11 +97,11 @@ namespace RT_CPU
 		} else if (p_id == 3) {
 			_camera = new CameraPerspective(Vec3f(-3.f, -2.f, 1.8f), Vec3f(-1.f, 0.f, 1.f), PIf / 3.f, 1.f, aspectRatio);
 			_lights.push_back(new SphereLight(Vec3f(0.f, 0.f, 2.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 0.5f, 30.f, 6));
-			_materials.push_back(new Material(Vec3f(0.5f, 0.5f, 0.5f), VEC3F_ZERO, 0.f, 0.f, 1.f, 0.f));
+			_materials.push_back(new Material(Vec3f(0.5f, 0.5f, 0.5f), VEC3F_ZERO, 0.f, 0.f, 1.f, 0.f, 1.f));
 			_loadGltf("assets/conference.glb");
 		}else if(p_id == 4) {
 			_camera = new CameraPerspective(Vec3f(-2.5f, -0.8f, 1.3f), Vec3f(1.f, 0.f, 1.f), PIf/3.f, 1.f, aspectRatio);
-			_materials.push_back(new Material(Vec3f(0.5f, 0.5f, 0.5f), VEC3F_ZERO, 0.f, 0.f, 1.f, 0.f));
+			_materials.push_back(new Material(Vec3f(0.5f, 0.5f, 0.5f), VEC3F_ZERO, 0.f, 0.f, 1.f, 0.f, 1.f));
 			_loadGltf("assets/conference_dragon_and_bunny.glb");
 		}
 
@@ -147,7 +147,8 @@ namespace RT_CPU
 				m.extensions.find("KHR_materials_emissive_strength") != m.extensions.end() && m.extensions.at("KHR_materials_emissive_strength").Has("emissiveStrength") ? (float)m.extensions.at("KHR_materials_emissive_strength").Get("emissiveStrength").GetNumberAsDouble() : 1.f,
 				(float)m.pbrMetallicRoughness.metallicFactor,
 				(float)m.pbrMetallicRoughness.roughnessFactor,
-				m.extensions.find("KHR_materials_ior") != m.extensions.end() && m.extensions.at("KHR_materials_ior").Has("ior") ? (float)m.extensions.at("KHR_materials_ior").Get("ior").GetNumberAsDouble() : 0.f
+				m.extensions.find("KHR_materials_transmission") != m.extensions.end() && m.extensions.at("KHR_materials_transmission").Has("transmissionFactor") ? (float)m.extensions.at("KHR_materials_transmission").Get("transmissionFactor").GetNumberAsDouble() : 0.f,
+				m.extensions.find("KHR_materials_ior") != m.extensions.end() && m.extensions.at("KHR_materials_ior").Has("ior") ? (float)m.extensions.at("KHR_materials_ior").Get("ior").GetNumberAsDouble() : 1.f
 			));
 
 		std::cout << "materials loaded: " << _materials.size() - startIdMaterials << std::endl;

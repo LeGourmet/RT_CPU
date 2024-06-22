@@ -22,12 +22,25 @@ D'autres améliorations ont aussi été réalisées comme :
 
 | Direct lighting | Path tracing  |
 | - | - |
-| ![Direct](results/conferenceDirect.png) | ![Indirect](results/conferenceIndirect.png) |
+| ![Direct](results/old/conferenceDirect.png) | ![Indirect](results/conferenceIndirect.png) |
 
 | Mandelbulb and julia set | Appolonius |
 | - | - |
-| ![Fractal1](results/fractal.png) | ![Fractal2](results/appolonius.png) |
+| ![Fractal1](results/old/fractal.png) | ![Fractal2](results/old/appolonius.png) |
 
-| Roughness 0.01 | Roughness 0.05 | Roughness 0.3 |
-| - | - | - |
-| ![Transmit0](results/transmit0.png) ![Metalic0](results/metalic0.png) | ![Transmit1](results/transmit1.png) ![Metalic1](results/metalic1.png) | ![Transmit2](results/transmit2.png) ![Metalic2](results/metalic2.png) |
+| Roughness | Dielectric | Metalic | Transmit |
+| - | - | - | - |
+| 0 | ![Dielectric0](results/dielectric0.png) | ![Metalic0](results/metalic0.png) | ![Transmit0](results/transmit0.png) |
+| 0.3 | ![Dielectric1](results/dielectric03.png) | ![Metalic1](results/metalic03.png) | ![Transmit1](results/transmit03.png) |
+| 0.5 | ![Dielectric2](results/dielectric05.png) | ![Metalic2](results/metalic05.png) | ![Transmit2](results/transmit05.png) |
+
+# Future ajouts
+
+Plusieurs ajouts sont en vue dans ce moteur :
+- la gestion d'un nouveaux type de géométrie (paramétrique : bezier patch/curve et NURBS)
+- l'ajout de support pour des nouveaux type de caméra (panoramique et fisheye)
+- la fusion des deux type de rendu par l'utilisation de Next Event Estimation (NEE)
+- la migration du path tracer vers un bidirectional path tracer
+- la gestion des textures (albedo, normal, metalness/roughness/transmitness)
+- l'amélioration de la BSDF (ajout clearcoat, sheen, anisotropie, ggx mutiscatering/energie compensation)
+- l'ajout d'effets de post-processing (AgX, denoiser)

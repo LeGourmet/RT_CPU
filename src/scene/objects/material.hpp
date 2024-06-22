@@ -17,14 +17,14 @@ namespace RT_CPU
     {
     public:
         // --------------------------------------------- DESTRUCTOR / CONSTRUCTOR ----------------------------------------------
-        Material(const Vec3f& p_baseColor, const Vec3f& p_emissiveColor, float p_emissiveStrength, float p_metalness, float p_roughness, float p_ior) :
-            _baseColor(p_baseColor), _emissiveColor(p_emissiveColor), _emissiveStrength(p_emissiveStrength), _metalness(p_metalness), _roughness(glm::max(1e-6f,p_roughness)), _ior(p_ior) { }
+        Material(const Vec3f& p_baseColor, const Vec3f& p_emissiveColor, float p_emissiveStrength, float p_metalness, float p_roughness, float p_transmitness, float p_ior) :
+            _baseColor(p_baseColor), _emissiveColor(p_emissiveColor), _emissiveStrength(p_emissiveStrength), _metalness(p_metalness), _roughness(p_roughness), _transmitness(p_transmitness), _ior(p_ior) { }
         ~Material() {}
 
         inline const float getIOR() const { return _ior; }
         inline const Vec3f getEmissivity() const { return _emissiveColor*_emissiveStrength; }
 
-        Vec3f evaluateBRDF(const Vec3f& V, const Vec3f& N, const Vec3f& H, const Vec3f& L, bool p_pdfWeighted){
+        /*Vec3f evaluateBRDF(const Vec3f& V, const Vec3f& N, const Vec3f& H, const Vec3f& L, bool p_pdfWeighted) {
             float cosNV = glm::max(1e-5f,glm::dot(N, V)); // max 1e-5f avoid artefacts
             float cosNL = glm::dot(N, L);
             float cosHN = glm::dot(H, N);
@@ -70,80 +70,127 @@ namespace RT_CPU
             //Vec3f transmit = _baseColor *4.f *(1.f-F)*D*V2 *p_no*p_no *cosHV*cosHL / glm::max(1e-5f,pow2(p_ni*cosHV + p_no*cosHL));
             //float pdf = glm::max(1e-5f, D * G1 / glm::max(1e-5f, 4.f * cosNV));
             return _baseColor * cosNL / PIf;
-        }
+        }*/
 
         Ray evaluateBSDF(const Ray& p_ray, const HitRecord& p_hitRecord, float p_ni, float p_no, Vec3f& p_rayColor) {
-           Vec3f H = sampleGGXVNDF(-p_ray.getDirection(),p_hitRecord._normal,_roughness,_roughness);
+            float roughness = glm::clamp(_roughness, 0.01f, 0.99f);
+            float r = roughness * roughness;
+            float r2 = r * r;
 
-            float F = schlick(fresnel(p_ni, p_no), 1.f, glm::dot(p_hitRecord._normal,-p_ray.getDirection()));
-            float reflectivity = 1.f-/*_transmitness**/(1.f-_metalness)*(1.f-F);
+            Vec3f V = -p_ray.getDirection();
+            Vec3f N = p_hitRecord._normal;
+            Vec3f H = sampleGGXVNDF(V,N,r,r);
+
+            float DielF = schlick(fresnel(p_ni, p_no), 1.f, glm::max(0.f, glm::dot(H, V)));
+            float cosNV = glm::max(1e-5f, glm::abs(glm::dot(N, V)));
+
+            float diffuseRate = (1.f-_metalness) * (1.f-_transmitness);
+            float specularRate = DielF;
+            float transmitRate = _transmitness * (1.f - _metalness) * (1.f - DielF);
+            float GlobalRate = randomFloat();
+
+            //float F = schlick(fresnel(p_ni, p_no), 1.f, glm::dot(p_hitRecord._normal,-p_ray.getDirection()));
+            //float reflectivity = 1.f-/*_transmitness**/(1.f-_metalness)*(1.f-F);
             
-            if (randomFloat() <= reflectivity || glm::length(glm::refract(p_ray.getDirection(), H, p_ni/p_no))==0.f) {
-                Ray reflectRay = Ray(p_hitRecord._point, glm::normalize(glm::reflect(p_ray.getDirection(), H)));
-                reflectRay.offset(p_hitRecord._normal);
+            // --- transmition ---
+            if (GlobalRate <= transmitRate) {
+                Vec3f transmitRayDir = glm::refract(p_ray.getDirection(), H, p_ni / p_no);
+                if (!(transmitRayDir.x == 0.f && transmitRayDir.y == 0.f && transmitRayDir.z == 0.f)) {
+                    Ray transmitRay = Ray(p_hitRecord._point, glm::normalize(transmitRayDir));
+                    transmitRay.offset(-p_hitRecord._normal);
 
-                if(glm::dot(reflectRay.getDirection(), p_hitRecord._normal) < 0.f) { 
-                    p_rayColor = VEC3F_ZERO;
-                } else {
-                    p_rayColor *= evaluateBRDF(-p_ray.getDirection(), p_hitRecord._normal, H, reflectRay.getDirection(), true);
-                }
-                return reflectRay;
-            } else {
-                Ray refractRay = Ray(p_hitRecord._point, glm::normalize(glm::refract(p_ray.getDirection(), H, p_ni / p_no)));
-                refractRay.offset(-p_hitRecord._normal);
+                    float cosNL = glm::max(0.f, glm::dot(-N, transmitRay.getDirection()));
 
-                if (glm::dot(refractRay.getDirection(), -p_hitRecord._normal) < 0.f) {
-                    p_rayColor = VEC3F_ZERO;
-                } else {
-                    p_rayColor *= evaluateBTDF(-p_ray.getDirection(), -p_hitRecord._normal, -H, refractRay.getDirection(), p_ni, p_no, true);
+                    float XL = glm::sqrt(r2 + (1.f - r2) * cosNL * cosNL);
+                    float XV = glm::sqrt(r2 + (1.f - r2) * cosNV * cosNV);
+                    float G1L = 2.f * cosNL / glm::max(1e-5f, (cosNL + XL));
+                    float G1V = 2.f * cosNV / glm::max(1e-5f, (cosNV + XV));
+                    float G2 = 2.f * cosNL * cosNV / glm::max(1e-5f, (cosNV * XL + cosNL * XV));
+
+                    p_rayColor *= glm::sqrt(_baseColor) * (1.f - DielF) * G2 * pow2(p_ni / p_no) / glm::max(1e-5f, G1L);
+                    
+                    return transmitRay;
                 }
-                return refractRay;
             }
+
+            // --- specular ---
+            if (GlobalRate <= specularRate / (diffuseRate + specularRate)) {
+                Ray specularRay = Ray(p_hitRecord._point, glm::normalize(glm::reflect(p_ray.getDirection(), H)));
+                specularRay.offset(p_hitRecord._normal);
+
+                float cosNL = glm::max(0.f, glm::dot(N, specularRay.getDirection()));
+                float cosHL = glm::max(0.f, glm::dot(H, specularRay.getDirection()));
+
+                Vec3f f0 = glm::mix(VEC3F_ONE, _baseColor, _metalness);
+                Vec3f F = schlick(f0, VEC3F_ONE, cosHL);
+                float XL = glm::sqrt(r2 + (1.f - r2) * cosNL * cosNL);
+                float XV = glm::sqrt(r2 + (1.f - r2) * cosNV * cosNV);
+                float G1L = 2.f * cosNL / glm::max(1e-5f, (cosNL + XL));
+                float G1V = 2.f * cosNV / glm::max(1e-5f, (cosNV + XV));
+                float G2 = 2.f * cosNL * cosNV / glm::max(1e-5f, (cosNV * XL + cosNL * XV));
+
+                p_rayColor *= F * G2 / glm::max(1e-5f, G1V);
+                
+                return specularRay;
+            }
+
+            // --- diffuse ---
+            Ray diffuseRay = Ray(p_hitRecord._point, sampleHemisphere(N));
+            diffuseRay.offset(p_hitRecord._normal);
+
+            float cosNL = glm::max(0.f, glm::dot(N, diffuseRay.getDirection()));
+            float cosHL = glm::max(0.f, glm::dot(glm::normalize(diffuseRay.getDirection() + V), diffuseRay.getDirection()));
+
+            float Rr = r * 2.f * cosHL * cosHL + 0.5f;
+            float Fl = pow5(1.f - cosNL);
+            float Fv = pow5(1.f - cosNV);
+
+            p_rayColor *= _baseColor * ((1.f - 0.5f * Fl) * (1.f - 0.5f * Fv) + Rr * (Fl + Fv + Fl * Fv * (Rr - 1.f)));
+
+            return diffuseRay;
         }
 
     private:
         // fresnel for normal incidence cosTi = cosTo = 1
-        float fresnel(float ni,float no) {
-            return pow2((ni - no) / (ni + no));
-        }
+        float fresnel(float ni, float no)                const { return pow2((ni - no) / (ni + no)); }
+        float schlick(float f0, float f90, float cosT)  const { return f0 + (f90 - f0) * pow5(1.f - cosT); }
+        Vec3f schlick(Vec3f f0, Vec3f f90, float cosT)  const { return f0 + (f90 - f0) * pow5(1.f - cosT); }
 
-        float schlick(float f0, float f90, float cosT) {
-            return f0 + (f90 - f0) * pow5(1.f-cosT);
-        }
-
-        Vec3f schlick(Vec3f f0, Vec3f f90, float cosT) {
-            return f0 + (f90 - f0) * pow5(1.f-cosT);
-        }
-
-        Vec3f sampleGGXVNDF(Vec3f V, Vec3f N, float rx, float ry) {
-            float s = (N.z>=0.) ? 1.f : -1.f;
-            float a = -1.f/(s+N.z);
-            float b = N.x*N.y*a;
-            Vec3f T = Vec3f(1.f+s*N.x*N.x*a, s*b, -s*N.x);
-            Vec3f B = Vec3f(b, s+N.y*N.y*a, -N.y);
+        Vec3f sampleGGXVNDF(Vec3f V, Vec3f N, float rx, float ry) const {
+            float s = (N.z >= 0.) ? 1.f : -1.f;
+            float a = -1.f / (s + N.z);
+            float b = N.x * N.y * a;
+            Vec3f T = Vec3f(1.f + s * N.x * N.x * a, s * b, -s * N.x);
+            Vec3f B = Vec3f(b, s + N.y * N.y * a, -N.y);
 
             V = Vec3f(glm::dot(V, T), glm::dot(V, B), glm::dot(V, N));
             Vec3f Vh = glm::normalize(V * Vec3f(rx, ry, 1.f));
 
             float phi = TWO_PIf * randomFloat();
-            float z = (1.f-randomFloat())*(1.f+Vh.z)-Vh.z;
-            float sinTheta = glm::sqrt(glm::clamp(1.f - z*z, 0.f, 1.f));
-            Vec3f Nh = glm::normalize(Vec3f(sinTheta*glm::cos(phi), sinTheta*glm::sin(phi), z) + Vh);
+            float z = (1.f - randomFloat()) * (1.f + Vh.z) - Vh.z;
+            float sinTheta = glm::sqrt(glm::clamp(1.f - z * z, 0.f, 1.f));
+            Vec3f Nh = glm::normalize(Vec3f(sinTheta * glm::cos(phi), sinTheta * glm::sin(phi), z) + Vh);
             Vec3f Ne = glm::normalize(Nh * Vec3f(rx, ry, 1.f));
 
-            return Ne.x * T + Ne.y * B + Ne.z * N;
+            return glm::normalize(Ne.x * T + Ne.y * B + Ne.z * N);
+        }
+
+        Vec3f sampleHemisphere(Vec3f N) const {
+            float a = TWO_PIf * randomFloat();
+            float b = 2.f * randomFloat() - 1.f;
+            return glm::normalize(N + Vec3f(glm::sqrt(1.f - b * b) * Vec2f(glm::cos(a), glm::sin(a)), b));
         }
 
     private:
         // ----------------------------------------------------- ATTRIBUTS -----------------------------------------------------
         Vec3f _baseColor = VEC3F_ONE;
         Vec3f _emissiveColor = VEC3F_ZERO;
-        // float transmitness
-
+        
         float _emissiveStrength = 0.f;
         float _metalness = 0.f;
         float _roughness = 1.f;
-        float _ior = 1.5;
+        float _transmitness = 0.f;
+        float _ior = 1.f;
     };
 }
 

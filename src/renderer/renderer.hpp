@@ -86,13 +86,21 @@ namespace RT_CPU
 			for(int i=0; i<_nbBounceMax ;i++) {
 				HitRecord hitRecord;
 				if (p_scene.intersect(currentRay, p_near, p_far, hitRecord)) {
-					if (inside) { no = 1.f; ni = hitRecord._object->getMaterial()->getIOR(); }
-					else		{ no = hitRecord._object->getMaterial()->getIOR(); ni = 1.f; }
+					no = ((inside) ? 1.f : hitRecord._object->getMaterial()->getIOR());
 					
 					finalColor += hitRecord._object->getMaterial()->getEmissivity()*rayColor;
 					currentRay = hitRecord._object->getMaterial()->evaluateBSDF(currentRay,hitRecord,ni,no,rayColor);
 					
-					if(glm::dot(hitRecord._normal,currentRay.getDirection())<0.f) inside = !inside;
+					if (rayColor.x == 0.f && rayColor.y == 0.f && rayColor.z == 0.f) break;
+
+					if (glm::dot(hitRecord._normal, currentRay.getDirection()) < 0.f) {
+						ni = ((inside) ? 1.f : hitRecord._object->getMaterial()->getIOR());
+						inside = !inside;
+					}
+				}
+				else {
+					finalColor += rayColor * Vec3f(0.001f); // envmap
+					break;
 				}
 			}
 			#endif
