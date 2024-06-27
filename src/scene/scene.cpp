@@ -22,12 +22,14 @@
 #include "scene/objects/geometry/implicit/appolonius_implicit.hpp"
 
 #include "scene/cameras/camera_perspective.hpp"
-#include "scene/cameras/camera_orthogonal.hpp"
+#include "scene/cameras/camera_orthographic.hpp"
+#include "scene/cameras/camera_panoramic.hpp"
+#include "scene/cameras/camera_fisheye.hpp"
 
-#include "scene/lights/basic/spot_light.hpp"
-#include "scene/lights/basic/point_light.hpp"
+#include "scene/lights/basic/ponctual_light.hpp"
 #include "scene/lights/basic/directional_light.hpp"
-#include "scene/lights/surfacic/sphere_light.hpp"
+#include "scene/lights/surfacic/quad_light.hpp"
+#include "scene/lights/volumic/sphere_light.hpp"
 
 #include <iostream>
 
@@ -57,10 +59,10 @@ namespace RT_CPU
 		}else if(p_id==1){
 			_camera = new CameraPerspective(Vec3f(0.f, -3.f, 2.5f), Vec3f(0.f, 0.f, 1.f), PIf / 3.f, 1.f, aspectRatio);
 
-			_materials.push_back(new Material(Vec3f(1.f, 1.f, 1.f)    , VEC3F_ONE , 5.f, 0.f, 1.f, 0.f, 1.f));
-			_materials.push_back(new Material(Vec3f(1.f, 1.f, 1.f) , VEC3F_ZERO, 0.f, 0.f, 1.f, 0.f, 1.f));
-			_materials.push_back(new Material(Vec3f(1.f, 0.f, 0.f)    , VEC3F_ZERO, 0.f, 0.f, 1.f, 0.f, 1.f));
-			_materials.push_back(new Material(Vec3f(0.f, 1.f, 0.f)    , VEC3F_ZERO, 0.f, 0.f, 1.f, 0.f, 1.f));
+			_materials.push_back(new Material(Vec3f(1.f, 1.f, 1.f)    , VEC3F_ONE , 5.f, 1.f, 0.8f, 0.f, 1.f));
+			_materials.push_back(new Material(Vec3f(1.f, 1.f, 1.f)    , VEC3F_ZERO, 0.f, 1.f, 0.8f, 0.f, 1.f));
+			_materials.push_back(new Material(Vec3f(1.f, 0.f, 0.f)    , VEC3F_ZERO, 0.f, 1.f, 0.8f, 0.f, 1.f));
+			_materials.push_back(new Material(Vec3f(0.f, 1.f, 0.f)    , VEC3F_ZERO, 0.f, 1.f, 0.8f, 0.f, 1.f));
 			_materials.push_back(new Material(Vec3f(0.8f, 0.235f, 0.f), VEC3F_ZERO, 0.f, 0.f, 0.f, 0.f, 1.f));
 			_materials.push_back(new Material(Vec3f(0.f, 0.235f, 0.8f), VEC3F_ZERO, 0.f, 0.f, 0.f, 0.f, 1.f));
 			
@@ -95,14 +97,39 @@ namespace RT_CPU
 			for (int i = 0; i < _objects.size();i++)
 				_objects[i]->setMaterial(_materials[i]);
 		} else if (p_id == 3) {
-			_camera = new CameraPerspective(Vec3f(-3.f, -2.f, 1.8f), Vec3f(-1.f, 0.f, 1.f), PIf / 3.f, 1.f, aspectRatio);
-			_lights.push_back(new SphereLight(Vec3f(0.f, 0.f, 2.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 0.5f, 30.f, 6));
+			_camera = new CameraPerspective(Vec3f(-2.5f, -0.8f, 1.3f), Vec3f(1.f, 0.f, 1.f), PIf / 3.f, 1.f, aspectRatio);
+			_lights.push_back(new SphereLight(Vec3f(0.f, 0.f, 2.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 0.5f, 30.f, 1));
 			_materials.push_back(new Material(Vec3f(0.5f, 0.5f, 0.5f), VEC3F_ZERO, 0.f, 0.f, 1.f, 0.f, 1.f));
 			_loadGltf("assets/conference.glb");
 		}else if(p_id == 4) {
 			_camera = new CameraPerspective(Vec3f(-2.5f, -0.8f, 1.3f), Vec3f(1.f, 0.f, 1.f), PIf/3.f, 1.f, aspectRatio);
 			_materials.push_back(new Material(Vec3f(0.5f, 0.5f, 0.5f), VEC3F_ZERO, 0.f, 0.f, 1.f, 0.f, 1.f));
 			_loadGltf("assets/conference_dragon_and_bunny.glb");
+		}
+
+		else if (p_id == 5) {
+			_camera = new CameraPerspective(Vec3f(0.f, -15.f, 15.f), Vec3f(0.f, -2.f, 2.f), PIf/3.f, 1.f, aspectRatio);
+			//_camera = new CameraOrthographic(Vec3f(0.f, -8.f, 8.f), Vec3f(0.f, -2.f, 2.f), 15.f*aspectRatio,15.f);
+			//_camera = new CameraPanoramic(Vec3f(0.f, -8.f, 8.f), Vec3f(0.f, -2.f, 2.f), 1.f);
+			//_camera = new CameraFisheye(Vec3f(0.f, -8.f, 8.f), Vec3f(0.f, -2.f, 2.f), 1.f);
+
+			_objects.push_back(new Plane(Vec3f(0.f, 0.f, 0.f), Vec3f(0., 0., 1.f)));
+			//_lights.push_back(new DirectionalLight(Vec3f(0.f, 0.f, 0.f), glm::normalize(Vec3f(0.f, -1.f, -1.f)), VEC3F_ONE, 3.f));
+			//_lights.push_back(new PonctualLight(Vec3f(0.f, 0.f, 10.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 300.f, -PIf, -PIf));
+			//_lights.push_back(new PonctualLight(Vec3f(0.f, 0.f, 10.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 300.f, PIf/5.f, PIf/3.f));
+			_lights.push_back(new QuadLight(Vec3f(0.f, 0.f, 10.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 10.f, Vec3f(4.f,0.f,0.f), Vec3f(0.f,4.f,0.f)));
+			//_lights.push_back(new SphereLight(Vec3f(0.f, 0.f, 10.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 10.f, 2.5f));
+			_materials.push_back(new Material(Vec3f(0.5f, 0.5f, 0.5f), VEC3F_ZERO, 0.f, 0.f, 1.f, 0.f, 1.f));
+
+			for (int i = 0; i < 5; i++)
+				for (int j = 0; j < 5; j++) {
+					_materials.push_back(new Material(Vec3f(randomFloat(), randomFloat(), randomFloat()), VEC3F_ZERO, 0.f, 1.f, 0.5f, 0.f, 1.5f));
+					_objects.push_back(new Sphere(Vec3f(-5.f + i * 2.5f, -5.f + j * 2.5f, 2.f), 1.f));
+				}
+
+			for (int i = 0; i < _objects.size(); i++)
+				_objects[i]->setMaterial(_materials[i]);
+
 		}
 
 		_bvh.build(&_objects);

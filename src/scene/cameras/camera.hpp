@@ -10,8 +10,7 @@ namespace RT_CPU
 	{
 	public:
 		// ----------------------------------------------- DESTRUCTOR / CONSTRUCTOR ----------------------------------------------
-		Camera(const Vec3f& p_position, const Vec3f& p_lookat, float p_xSize, float p_ySize) 
-			: _position(p_position), _xSize(p_xSize), _ySize(p_ySize) {
+		Camera(const Vec3f& p_position, const Vec3f& p_lookat) : _position(p_position) {
 			_w = glm::normalize(p_lookat - p_position);
 			_u = glm::normalize(glm::cross(_w, Vec3f(0.f,0.f,1.f)));
 			_v = glm::normalize(glm::cross(_w, _u));
@@ -26,9 +25,6 @@ namespace RT_CPU
 
 	protected:
 		// ----------------------------------------------------- ATTRIBUTS -------------------------------------------------------
-		float _xSize = 1.f;
-		float _ySize = 1.f;
-
 		Vec3f _u = VEC3F_X;
 		Vec3f _v = VEC3F_Z;
 		Vec3f _w = VEC3F_Y;

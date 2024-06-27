@@ -13,7 +13,8 @@ namespace RT_CPU
 			: Light(p_position, p_direction, p_color, p_power, 1) {}
 		virtual ~BasicLight() = default;
 
-		virtual LightSample sample( const Vec3f & p_point, int p_id ) const = 0;
+		LightSample sample(const Vec3f& p_point, int p_id) const override { return sample(p_point); }
+		virtual LightSample sample(const Vec3f& p_point) const = 0;
 	};
 
 }

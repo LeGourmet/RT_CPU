@@ -38,9 +38,15 @@ D'autres améliorations ont aussi été réalisées comme :
 
 Plusieurs ajouts sont en vue dans ce moteur :
 - la gestion d'un nouveaux type de géométrie (paramétrique : bezier patch/curve et NURBS)
+- la gestion de géométrie implicite 2D ()
+- l'ajout de nouveau type de géométrie implicite 3D ()
+- l'ajout de nouveau type de géométrie implicite fractale 3D ()
+- l'ajout de support pour les oppérateur de modélisation par CSG des objets à géométrie implicite
 - l'ajout de support pour des nouveaux type de caméra (panoramique et fisheye)
-- la fusion des deux type de rendu par l'utilisation de Next Event Estimation (NEE)
-- la migration du path tracer vers un bidirectional path tracer
+- l'ajout de support pour des nouveaux type de basic lights (Goniophotometric Diagram Map or IES profile)
+- l'ajout de support pour des nouveaux type de surfasic lights (cylinder et disk)
+- l'ajout de support pour les environement map
+- l'amélioration de la méthode de rendu par l'utilisation de NEE et de bidirectional path tracing
 - la gestion des textures (albedo, normal, metalness/roughness/transmitness)
 - l'amélioration de la BSDF (ajout clearcoat, sheen, anisotropie, ggx mutiscatering/energie compensation)
 - l'ajout d'effets de post-processing (AgX, denoiser)
