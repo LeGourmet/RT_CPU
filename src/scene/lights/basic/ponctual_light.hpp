@@ -21,13 +21,13 @@ namespace RT_CPU
 			float intensity = glm::clamp((glm::dot(-dir,_direction)-_cosOuterAngle)/(_cosInnerAngle-_cosOuterAngle), 0.f, 1.f);
 			//float profil = texture2DLodEXT(_profil, Vec2f(glm::acos(glm::dot(-dir,_direction))*INV_PIf,0.f), 0.f).r;
 
-			return LightSample(intensity*_color*_power/dist_sq, dir, glm::sqrt(dist_sq), 1.f);
+			return LightSample(intensity*_color*_power, dir, glm::sqrt(dist_sq), dist_sq);
 		}
 	  
 	  private:
 		float _cosInnerAngle;
 		float _cosOuterAngle;
-		// texture _profil		( )
+		// texture _profil
 	};
 
 }

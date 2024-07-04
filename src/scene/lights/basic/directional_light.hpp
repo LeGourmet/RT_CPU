@@ -16,10 +16,9 @@ namespace RT_CPU
 		LightSample sample(const Vec3f& p_point) const override {
 			return LightSample(_color*_power, -_direction, FLT_MAX, 1.f);
 		}
-
 	};
 
-	// scattering ?
+	// float jittering
 }
 
 #endif

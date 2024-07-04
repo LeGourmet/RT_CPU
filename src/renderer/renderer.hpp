@@ -31,6 +31,25 @@ namespace RT_CPU
 			// sampling camera aperture(u,v) => depth of field
 			// sampling in time (the shutter) => motion blur
 
+			/*
+			 #ifdef MOVE_CAMERA
+			float an = (-iMouse.x/iResolution.x-.5)*3.141592;
+			vec3 ro = vec3(8.*sin(an), iMouse.y/iResolution.y*4.-2., 8.*cos(an)); // camera position
+			#else
+			vec3 ro = vec3(8.*sin(3.8), .3, 8.*cos(3.8)); // camera position
+			#endif
+			vec3 ta = vec3(0,.5,0); // target
+			mat3 ca = setCamera(ro, ta); // camera matrix
+			vec3 rd = ca * normalize(vec3(p,1.78)); // ray direction
+    
+			// depth of field
+			vec3 n, mat; int type; vec2 v;
+			float t = intersect(ro, normalize(ta - ro), n, mat, type, v);
+			vec3 fp = ro + rd*t; // focus plane
+			ro += ca*vec3(uniformVector().xy,0)*.12; // <- change this value for the aperture
+			rd = normalize(fp - ro);
+			*/
+
 			#pragma omp parallel for schedule( dynamic )
 			for (int j = 0; j < height;j++) {
 				for (int i = 0; i < width;i++) {
@@ -71,7 +90,7 @@ namespace RT_CPU
 						shadowRay.offset(hitRecord._normal);
 
 						if(glm::dot(hitRecord._normal,shadowRay.getDirection())>0.f && glm::dot(hitRecord._normal,-p_ray.getDirection())>0.f && !p_scene.intersectAny(shadowRay,1e-2f,lightSample._distance))
-							lightRadiosity += lightSample._radiance * hitRecord._object->getMaterial()->evaluateBRDF(-p_ray.getDirection(), hitRecord._normal, lightSample._direction);
+							lightRadiosity += lightSample._radiance * hitRecord._object->getMaterial()->evaluateBRDF(-p_ray.getDirection(), hitRecord._normal, lightSample._direction) / lightSample._pdf;
 					}
 					finalColor += lightRadiosity / (float)light->getNbShadowRay();
 				}

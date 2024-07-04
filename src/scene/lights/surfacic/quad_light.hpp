@@ -19,25 +19,29 @@ namespace RT_CPU
 						 (((p_i%_nbRow)+randomFloat())/float(_nbRow)-0.5f)*_v + 
 						 _position;
 
+			// todo rotate frag with direction
+
 			Vec3f vec = frag-p_point;
 			float dist_sq = glm::dot(vec,vec);
 			Vec3f dir = glm::normalize(vec);
 
-			// pdf => 1/area ?
+			float pdf = dist_sq/(glm::abs(glm::dot(_direction,dir))*_area);
 
-			return LightSample((glm::abs(glm::dot(_direction,dir))*_area)*_color*_power/dist_sq, dir, glm::sqrt(dist_sq), 1.f);
+			return LightSample(_color*_power, dir, glm::sqrt(dist_sq), pdf);
 		}
 
 		inline LightSample sample(const Vec3f& p_point) const override {
 			Vec3f frag = (randomFloat()-0.5f)*_u + (randomFloat()-0.5f)*_v + _position;
 			
+			// todo rotate frag with direction
+
 			Vec3f vec = frag-p_point;
 			float dist_sq = glm::dot(vec,vec);
 			Vec3f dir = glm::normalize(vec);
 
-			// pdf => 1/area ?
+			float pdf = dist_sq/(glm::abs(glm::dot(_direction,dir))*_area);
 
-			return LightSample((glm::abs(glm::dot(_direction,dir))*_area)*_color*_power/dist_sq, dir, glm::sqrt(dist_sq), 1.f);
+			return LightSample(_color*_power, dir, glm::sqrt(dist_sq), pdf);
 		}
 
 	  private:
