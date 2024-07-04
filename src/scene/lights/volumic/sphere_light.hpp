@@ -41,9 +41,10 @@ namespace RT_CPU
 			float dist_sq = glm::dot(vec,vec);
 			Vec3f dir = glm::normalize(vec);
 			
-			float pdf = dist_sq/(glm::abs(glm::dot(glm::normalize(frag-_position),dir))*_volume);
-
-			return LightSample(_color*_power, dir, glm::sqrt(dist_sq), pdf);
+			float pdf = dist_sq;
+			float intensity = glm::abs(glm::dot(glm::normalize(frag - _position), dir)) * _volume;
+			
+			return LightSample(_color*_power*intensity, dir, glm::sqrt(dist_sq), pdf);
 		}
 
 	  private:

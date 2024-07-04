@@ -85,12 +85,12 @@ namespace RT_CPU
 				for (Light* light : p_scene.getLights()) {
 					Vec3f lightRadiosity = VEC3F_ZERO;
 					for (int i = 0; i < light->getNbShadowRay();i++) {
-						LightSample lightSample = light->sample(hitRecord._point,i);
+						LightSample lightSample = light->sample(hitRecord._point);
 						Ray shadowRay = Ray(hitRecord._point, lightSample._direction);
 						shadowRay.offset(hitRecord._normal);
 
 						if(glm::dot(hitRecord._normal,shadowRay.getDirection())>0.f && glm::dot(hitRecord._normal,-p_ray.getDirection())>0.f && !p_scene.intersectAny(shadowRay,1e-2f,lightSample._distance))
-							lightRadiosity += lightSample._radiance * hitRecord._object->getMaterial()->evaluateBRDF(-p_ray.getDirection(), hitRecord._normal, lightSample._direction) / lightSample._pdf;
+							lightRadiosity += lightSample._radiance * hitRecord._object->getMaterial()->evaluateBRDF(-p_ray.getDirection(), hitRecord._normal, lightSample._direction) / glm::max(1e-5f,lightSample._pdf);
 					}
 					finalColor += lightRadiosity / (float)light->getNbShadowRay();
 				}
