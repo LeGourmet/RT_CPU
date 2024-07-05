@@ -22,7 +22,7 @@ D'autres améliorations ont aussi été réalisées comme :
 
 | Direct lighting | Path tracing  |
 | - | - |
-| ![Direct](results/old/conferenceDirect.png) | ![Indirect](results/conferenceIndirect.png) |
+| ![Direct](results/conferenceDirect.png) | ![Indirect](results/conferenceIndirect.png) |
 
 | Mandelbulb and julia set | Appolonius |
 | - | - |

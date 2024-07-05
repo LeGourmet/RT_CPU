@@ -57,9 +57,10 @@ namespace RT_CPU
 				_objects[i]->setMaterial(_materials[i]);
 
 		}else if(p_id==1){
-			_camera = new CameraPerspective(Vec3f(0.f, -3.f, 2.5f), Vec3f(0.f, 0.f, 1.f), PIf / 3.f, 1.f, aspectRatio);
+			_camera = new CameraPerspective(Vec3f(0.f, -4.f, 3.f), Vec3f(0.f, 0.f, 1.f), PIf / 3.f, 1.f, aspectRatio);
 
-			_materials.push_back(new Material(Vec3f(1.f, 1.f, 1.f)    , VEC3F_ONE , 5.f, 1.f, 0.8f, 0.f, 1.f));
+			//_materials.push_back(new Material(Vec3f(1.f, 1.f, 1.f)    , VEC3F_ONE , 5.f, 1.f, 0.8f, 0.f, 1.f));
+			_materials.push_back(new Material(Vec3f(1.f, 1.f, 1.f)    , VEC3F_ONE , 8.f, 0.f, 1.f, 0.f, 1.f));
 			_materials.push_back(new Material(Vec3f(1.f, 1.f, 1.f)    , VEC3F_ZERO, 0.f, 1.f, 0.8f, 0.f, 1.f));
 			_materials.push_back(new Material(Vec3f(1.f, 0.f, 0.f)    , VEC3F_ZERO, 0.f, 1.f, 0.8f, 0.f, 1.f));
 			_materials.push_back(new Material(Vec3f(0.f, 1.f, 0.f)    , VEC3F_ZERO, 0.f, 1.f, 0.8f, 0.f, 1.f));
@@ -86,10 +87,10 @@ namespace RT_CPU
 			_objects[7]->setMaterial(_materials[4]);
 			_objects[8]->setMaterial(_materials[5]);
 		} else if (p_id == 2) {
-			_camera = new CameraPerspective(Vec3f(-3.f, 0.f, 5.f), Vec3f(-3.f, -1.f, 5.f), PIf / 3.f, 1.f, aspectRatio);
+			_camera = new CameraPerspective(Vec3f(-3.f, 1.f, 5.f), Vec3f(-3.f, 0.f, 5.f), PIf / 3.f, 1.f, aspectRatio);
 
 			_materials.push_back(new Material(Vec3f(1.f, 1.f, 1.f), VEC3F_ONE, 20.f, 0.f, 1.f, 0.f, 1.f));
-			_materials.push_back(new Material(Vec3f(0.53f, 0.3f, 0.075f), VEC3F_ZERO, 0.f, 0.9f, 0.5f, 0.f, 1.f));
+			_materials.push_back(new Material(Vec3f(0.35f, 0.2f, 0.05f), VEC3F_ZERO, 0.f, 0.75f, 0.5f, 0.f, 1.f));
 
 			_objects.push_back(new Plane(Vec3f(0.f, 0.f, 10.f), Vec3f(0.f,0.f,-1.f)));
 			_objects.push_back(new AppoloniusImplicit(Vec3f(0.f, 0.f, 0.f)));
