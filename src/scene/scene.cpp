@@ -59,17 +59,15 @@ namespace RT_CPU
 		}else if(p_id==1){
 			_camera = new CameraPerspective(Vec3f(0.f, -4.f, 3.f), Vec3f(0.f, 0.f, 1.f), PIf / 3.f, 1.f, aspectRatio);
 
-			//_materials.push_back(new Material(Vec3f(1.f, 1.f, 1.f)    , VEC3F_ONE , 5.f, 1.f, 0.8f, 0.f, 1.f));
-			_materials.push_back(new Material(Vec3f(1.f, 1.f, 1.f)    , VEC3F_ONE , 8.f, 0.f, 1.f, 0.f, 1.f));
-			_materials.push_back(new Material(Vec3f(1.f, 1.f, 1.f)    , VEC3F_ZERO, 0.f, 1.f, 0.8f, 0.f, 1.f));
-			_materials.push_back(new Material(Vec3f(1.f, 0.f, 0.f)    , VEC3F_ZERO, 0.f, 1.f, 0.8f, 0.f, 1.f));
-			_materials.push_back(new Material(Vec3f(0.f, 1.f, 0.f)    , VEC3F_ZERO, 0.f, 1.f, 0.8f, 0.f, 1.f));
-			_materials.push_back(new Material(Vec3f(0.8f, 0.235f, 0.f), VEC3F_ZERO, 0.f, 0.f, 0.f, 0.f, 1.f));
-			_materials.push_back(new Material(Vec3f(0.f, 0.235f, 0.8f), VEC3F_ZERO, 0.f, 0.f, 0.f, 0.f, 1.f));
+			_materials.push_back(new Material(Vec3f(1.f, 1.f, 1.f)    , VEC3F_ONE , 5.f, 0.f, 1.f, 0.f, 1.f));
+			_materials.push_back(new Material(Vec3f(1.f, 1.f, 1.f)    , VEC3F_ZERO, 0.f, 1.f, 1.f, 0.f, 1.f));
+			_materials.push_back(new Material(Vec3f(1.f, 0.f, 0.f)    , VEC3F_ZERO, 0.f, 1.f, 1.f, 0.f, 1.f));
+			_materials.push_back(new Material(Vec3f(0.f, 1.f, 0.f)    , VEC3F_ZERO, 0.f, 1.f, 1.f, 0.f, 1.f));
+			_materials.push_back(new Material(Vec3f(0.8f, 0.235f, 0.f), VEC3F_ZERO, 0.f, 1.f, 0.5f, 0.f, 1.f));
+			_materials.push_back(new Material(Vec3f(0.f, 0.235f, 0.8f), VEC3F_ZERO, 0.f, 1.f, 0.5f, 0.f, 1.f));
 			
-			_objects.push_back(new Sphere(Vec3f(0.f, 0.f, 10.f), 3.f));
-			_objects.push_back(new Plane(Vec3f(0.f, 0.f, 0.f), Vec3f(0.f, 0.f, 1.f)));
 			_objects.push_back(new Plane(Vec3f(0.f, 0.f, 10.f), Vec3f(0.f, 0.f, -1.f)));
+			_objects.push_back(new Plane(Vec3f(0.f, 0.f, 0.f), Vec3f(0.f, 0.f, 1.f)));
 			_objects.push_back(new Plane(Vec3f(-5.f, 0.f, 0.f), Vec3f(1.f, 0.f, 0.f)));
 			_objects.push_back(new Plane(Vec3f(5.f, 0.f, 0.f), Vec3f(-1.f, 0.f, 0.f)));
 			_objects.push_back(new Plane(Vec3f(0.f, 5.f, 0.f), Vec3f(0.f, -1.f, 0.f)));
@@ -79,13 +77,12 @@ namespace RT_CPU
 
 			_objects[0]->setMaterial(_materials[0]);
 			_objects[1]->setMaterial(_materials[1]);
-			_objects[2]->setMaterial(_materials[1]);
-			_objects[3]->setMaterial(_materials[2]);
-			_objects[4]->setMaterial(_materials[3]);
+			_objects[2]->setMaterial(_materials[2]);
+			_objects[3]->setMaterial(_materials[3]);
+			_objects[4]->setMaterial(_materials[1]);
 			_objects[5]->setMaterial(_materials[1]);
-			_objects[6]->setMaterial(_materials[1]);
-			_objects[7]->setMaterial(_materials[4]);
-			_objects[8]->setMaterial(_materials[5]);
+			_objects[6]->setMaterial(_materials[4]);
+			_objects[7]->setMaterial(_materials[5]);
 		} else if (p_id == 2) {
 			_camera = new CameraPerspective(Vec3f(-3.f, 1.f, 5.f), Vec3f(-3.f, 0.f, 5.f), PIf / 3.f, 1.f, aspectRatio);
 

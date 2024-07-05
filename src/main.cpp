@@ -22,7 +22,7 @@ int main(int argc, char** argv)
 
 		Image img = Image(imgWidth, imgHeight);
 
-		Scene scene = Scene(img, 2);
+		Scene scene = Scene(img, 1);
 		Renderer renderer = Renderer(64);
 
 		// Launch rendering.

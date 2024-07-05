@@ -26,7 +26,7 @@ D'autres améliorations ont aussi été réalisées comme :
 
 | Mandelbulb and julia set | Appolonius |
 | - | - |
-| ![Fractal1](results/old/fractal.png) | ![Fractal2](results/old/appolonius.png) |
+| ![Fractal1](results/fractal.png) | ![Fractal2](results/appolonius.png) |
 
 | Roughness | Dielectric | Metalic | Transmit |
 | - | - | - | - |
