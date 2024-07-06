@@ -49,7 +49,7 @@ namespace RT_CPU
 			
 			for(int i=0; i<5 ;i++)
 				for(int j=0; j<5 ;j++){
-					_materials.push_back(new Material(Vec3f(randomFloat(), randomFloat(), randomFloat()), VEC3F_ZERO, 0.f, 0.f, 0.f, 0.f, 1.5f));
+					_materials.push_back(new Material(Vec3f(randomFloat(), randomFloat(), randomFloat()), VEC3F_ZERO, 0.f, 1.f, 0.3f, 1.f, 1.5f));
 					_objects.push_back(new Sphere(Vec3f(-5.f + i * 2.5f, -5.f + j * 2.5f, 2.f), 1.f));
 				}
 

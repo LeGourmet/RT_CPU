@@ -30,9 +30,9 @@ D'autres améliorations ont aussi été réalisées comme :
 
 | Roughness | Dielectric | Metalic | Transmit |
 | - | - | - | - |
-| 0 | ![Dielectric0](results/dielectric0.png) | ![Metalic0](results/metalic0.png) | ![Transmit0](results/transmit0.png) |
-| 0.3 | ![Dielectric1](results/dielectric03.png) | ![Metalic1](results/metalic03.png) | ![Transmit1](results/transmit03.png) |
-| 0.5 | ![Dielectric2](results/dielectric05.png) | ![Metalic2](results/metalic05.png) | ![Transmit2](results/transmit05.png) |
+| 0 | ![Dielectric0](results/materials/dielectric0.png) | ![Metalic0](results/materials/metalic0.png) | ![Transmit0](results/materials/transmit0.png) |
+| 0.3 | ![Dielectric1](results/materials/dielectric03.png) | ![Metalic1](results/materials/metalic03.png) | ![Transmit1](results/materials/transmit03.png) |
+| 0.5 | ![Dielectric2](results/materials/dielectric05.png) | ![Metalic2](results/materials/metalic05.png) | ![Transmit2](results/materials/transmit05.png) |
 
 # Future ajouts
 
