@@ -87,15 +87,18 @@ namespace RT_CPU
 
             float cosNV = glm::max(1e-5f,glm::dot(N, V));
             float cosNL = glm::max(0.f,glm::dot(N, L));
-            float cosNH = glm::max(1e-5f,glm::dot(N, H));
+            //float cosNH = glm::clamp(glm::dot(N, H), 1e-16f, 1.f-1e-16f);
+            float cosNH = glm::max(0.f,glm::dot(N, H));
             float cosHL = glm::max(0.f,glm::dot(H, L));
             float cosHV = glm::max(0.f,glm::dot(H, V));
 
             // ------------ SPECULAR ------------
             Vec3f f0 = glm::mix(VEC3F_ONE, _baseColor, _metalness);
             Vec3f F = schlick(f0, VEC3F_ONE, cosHL); // L or V ?
-            float D = r2 / glm::max(1e-5f,(PIf*pow2((cosNH*cosNH)*(r2-1.f)+1.f)));
-            float V2 = 0.5f/glm::max(1e-5f,(cosNL*glm::sqrt(r2+(1.f-r2)*cosNV*cosNV) + cosNV*glm::sqrt(r2+(1.f-r2)*cosNL*cosNL)));
+            //float D = r2 / (PIf*pow2((cosNH*cosNH)*(r2-1.f)+1.f));
+            float D = r2 / (PIf*pow2((cosNH*cosNH)*(r2-1.f)+1.f));
+            //float V2 = 0.5f/glm::max(1e-5f,(cosNL*glm::sqrt(r2+(1.f-r2)*cosNV*cosNV) + cosNV*glm::sqrt(r2+(1.f-r2)*cosNL*cosNL)));
+            float V2 = 0.5f/(cosNL*glm::sqrt(r2+(1.f-r2)*cosNV*cosNV) + cosNV*glm::sqrt(r2+(1.f-r2)*cosNL*cosNL));
             //float V2 = 0.5f/glm::max(1e-5f,glm::mix(2.f*cosNL*cosNV,cosNL+cosNV,r));
             Vec3f specular = F * D * V2;
             
