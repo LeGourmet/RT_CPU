@@ -3,7 +3,7 @@
 
 #include "aabb.hpp"
 #include "ray/hit_record.hpp"
-#include "scene/objects/object.hpp"
+#include "scene/meshes/mesh.hpp"
 
 #include <vector>
 
@@ -23,8 +23,8 @@ namespace RT_CPU
 		AABB			_aabb;
 		BVHNode*		_left			= nullptr;
 		BVHNode*		_right			= nullptr;
-		unsigned int	_firstObjectId	= 0;
-		unsigned int	_lastObjectId	= 0;
+		unsigned int	_firstMeshId	= 0;
+		unsigned int	_lastMeshId	= 0;
 	};
 
 	class BVH
@@ -35,20 +35,20 @@ namespace RT_CPU
 
 		inline AABB getRootAABB() { return _root->_aabb; }
 
-		void build(std::vector<Object*>* p_objects);
+		void build(std::vector<Mesh*>* p_meshes);
 		bool intersect(const Ray& p_ray, const float p_tMin, const float p_tMax, HitRecord& p_hitRecord) const;
 		bool intersectAny(const Ray& p_ray, const float p_tMin, const float p_tMax) const;
 
 	private:
-		void _buildRec(BVHNode* p_node, unsigned int p_firstObjectId, unsigned int p_lastObjectId, unsigned int p_depth);
+		void _buildRec(BVHNode* p_node, unsigned int p_firstMeshId, unsigned int p_lastMeshId, unsigned int p_depth);
 		bool _intersectRec(const BVHNode* p_node, const Ray& p_ray, float p_tMin, float p_tMax, HitRecord& p_hitRecord) const;
 		bool _intersectAnyRec(const BVHNode* p_node, const Ray& p_ray, float p_tMin, float	p_tMax) const;
 
 	private:
 		BVHNode* _root = nullptr;
-		std::vector<Object*>* _objects = nullptr;
+		std::vector<Mesh*>* _meshes = nullptr;
 
-		static const unsigned int _maxObjectsPerLeaf = 8;
+		static const unsigned int _maxMeshesPerLeaf = 8;
 		static const unsigned int _maxDepth = 32;
 	};
 }

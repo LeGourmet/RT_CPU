@@ -5,8 +5,8 @@
 
 #include "lights/light.hpp"
 #include "cameras/camera.hpp"
-#include "objects/material.hpp"
-#include "objects/object.hpp"
+#include "meshes/material/material.hpp"
+#include "meshes/mesh.hpp"
 #include "ray/hit_record.hpp"
 
 #include "accelerators/bvh.hpp"
@@ -24,7 +24,7 @@ namespace RT_CPU
 
 		inline const Camera& getCamera() const { return *_camera; }
 		inline const std::vector<Light*>& getLights() const { return _lights; }
-		inline const std::vector<Object*>& getMeshes() const { return _objects; }
+		inline const std::vector<Mesh*>& getMeshes() const { return _meshes; }
 
 		bool intersect(const Ray& p_ray, const float p_tMin, const float p_tMax, HitRecord& p_hitRecord) const;
 		bool intersectAny(const Ray& p_ray, const float p_tMin, const float p_tMax) const;
@@ -37,7 +37,7 @@ namespace RT_CPU
 
 		Camera*					_camera;
 		std::vector<Light*>		_lights;
-		std::vector<Object*>	_objects;
+		std::vector<Mesh*>		_meshes;
 		std::vector<Material*>	_materials;
 	};
 }

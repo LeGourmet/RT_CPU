@@ -95,52 +95,52 @@
     <ClInclude Include="src\utils\progress_bar.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="src\scene\objects\geometry\analytic\plane.hpp">
+    <ClInclude Include="src\scene\meshes\geometry\analytic\plane.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="src\scene\objects\geometry\analytic\sphere.hpp">
+    <ClInclude Include="src\scene\meshes\geometry\analytic\sphere.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="src\scene\objects\geometry\analytic\triangle.hpp">
+    <ClInclude Include="src\scene\meshes\geometry\analytic\triangle.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="src\scene\objects\geometry\implicit\plane_implicit.hpp">
+    <ClInclude Include="src\scene\meshes\geometry\implicit\3D\plane_implicit.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="src\scene\objects\geometry\implicit\sphere_implicit.hpp">
+    <ClInclude Include="src\scene\meshes\geometry\implicit\3D\sphere_implicit.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="src\scene\objects\geometry\implicit\torus_implicit.hpp">
+    <ClInclude Include="src\scene\meshes\geometry\implicit\3D\torus_implicit.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="src\scene\objects\geometry\implicit\cube_implicit.hpp">
+    <ClInclude Include="src\scene\meshes\geometry\implicit\3D\cube_implicit.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="src\scene\objects\geometry\implicit\cylinder_implicit.hpp">
+    <ClInclude Include="src\scene\meshes\geometry\implicit\3D\cylinder_implicit.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="src\scene\objects\geometry\implicit\julia_implicit.hpp">
+    <ClInclude Include="src\scene\meshes\geometry\implicit\fractal\julia_fractal.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="src\scene\objects\geometry\implicit\mandelbulb_implicit.hpp">
+    <ClInclude Include="src\scene\meshes\geometry\implicit\fractal\mandelbulb_fractal.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="src\scene\scene.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="src\scene\objects\object.hpp">
+    <ClInclude Include="src\scene\meshes\mesh.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="src\scene\objects\material.hpp">
+    <ClInclude Include="src\scene\meshes\material\material.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="src\scene\objects\geometry\analytic\triangle_mesh.hpp">
+    <ClInclude Include="src\scene\meshes\geometry\analytic\triangle_mesh.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="src\accelerators\bvh.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="src\scene\objects\geometry\implicit\object_implicit.hpp">
+    <ClInclude Include="src\scene\meshes\geometry\implicit\mesh_implicit.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="lib\tinygltf\json.hpp">
@@ -149,13 +149,13 @@
     <ClInclude Include="lib\tinygltf\tiny_gltf.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="src\scene\objects\geometry\implicit\sierpinski_implicit.hpp">
+    <ClInclude Include="src\scene\meshes\geometry\implicit\fractal\sierpinski_fractal.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="src\scene\objects\geometry\implicit\menger_implicit.hpp">
+    <ClInclude Include="src\scene\meshes\geometry\implicit\fractal\menger_fractal.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="src\scene\objects\geometry\implicit\appolonius_implicit.hpp">
+    <ClInclude Include="src\scene\meshes\geometry\implicit\fractal\apollonius_fractal.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="src\scene\cameras\camera_fisheye.hpp">
@@ -165,6 +165,51 @@
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="src\scene\lights\volumic\volumic_light.hpp">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scene\meshes\material\texture.hpp">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scene\meshes\material\image.hpp">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scene\meshes\geometry\implicit\2D\disk_implicit.hpp">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scene\meshes\geometry\implicit\2D\solid_angle_implicit.hpp">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scene\meshes\geometry\implicit\2D\ellipse_implicit.hpp">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scene\meshes\geometry\implicit\2D\segment_implicit.hpp">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scene\meshes\geometry\implicit\2D\bezier_curve_implicit.hpp">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scene\meshes\geometry\implicit\2D\rectangle_implicit.hpp">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scene\meshes\geometry\implicit\2D\regular_polygon_implicit.hpp">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scene\meshes\geometry\implicit\2D\polygon_implicit.hpp">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scene\meshes\geometry\parametric\bezier_curve.hpp">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scene\meshes\geometry\parametric\catmull_rom_curve.hpp">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scene\meshes\geometry\parametric\nurbs_curve.hpp">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scene\meshes\geometry\parametric\nurbs_patch.hpp">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scene\meshes\geometry\analytic\micro_mesh.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
   </ItemGroup>

@@ -5,21 +5,21 @@
 
 #include "utils/defines.hpp"
 
-#include "scene/objects/geometry/analytic/plane.hpp"
-#include "scene/objects/geometry/analytic/sphere.hpp"
-#include "scene/objects/geometry/analytic/triangle_mesh.hpp"
+#include "scene/meshes/geometry/analytic/plane.hpp"
+#include "scene/meshes/geometry/analytic/sphere.hpp"
+#include "scene/meshes/geometry/analytic/triangle_mesh.hpp"
 
-#include "scene/objects/geometry/implicit/plane_implicit.hpp"
-#include "scene/objects/geometry/implicit/sphere_implicit.hpp"
-#include "scene/objects/geometry/implicit/cube_implicit.hpp"
-#include "scene/objects/geometry/implicit/torus_implicit.hpp"
-#include "scene/objects/geometry/implicit/cylinder_implicit.hpp"
+#include "scene/meshes/geometry/implicit/3D/plane_implicit.hpp"
+#include "scene/meshes/geometry/implicit/3D/sphere_implicit.hpp"
+#include "scene/meshes/geometry/implicit/3D/cube_implicit.hpp"
+#include "scene/meshes/geometry/implicit/3D/torus_implicit.hpp"
+#include "scene/meshes/geometry/implicit/3D/cylinder_implicit.hpp"
 
-#include "scene/objects/geometry/implicit/mandelbulb_implicit.hpp"
-#include "scene/objects/geometry/implicit/julia_implicit.hpp"
-#include "scene/objects/geometry/implicit/menger_implicit.hpp"
-#include "scene/objects/geometry/implicit/sierpinski_implicit.hpp"
-#include "scene/objects/geometry/implicit/appolonius_implicit.hpp"
+#include "scene/meshes/geometry/implicit/fractal/mandelbulb_fractal.hpp"
+#include "scene/meshes/geometry/implicit/fractal/julia_fractal.hpp"
+#include "scene/meshes/geometry/implicit/fractal/menger_fractal.hpp"
+#include "scene/meshes/geometry/implicit/fractal/sierpinski_fractal.hpp"
+#include "scene/meshes/geometry/implicit/fractal/apollonius_fractal.hpp"
 
 #include "scene/cameras/camera_perspective.hpp"
 #include "scene/cameras/camera_orthographic.hpp"
@@ -38,25 +38,63 @@ namespace RT_CPU
 	Scene::Scene(const Image& p_image, unsigned int p_id) {
 		float aspectRatio = float(p_image.getWidth()) / float(p_image.getHeight());
 		
-		if(p_id==0){
-			_camera = new CameraPerspective(Vec3f(0.f, -9.f, 9.f), Vec3f(0.f, -2.f, 2.f), PIf / 3.f, 1.f, aspectRatio);
+		// material test
+		// fractal test	
+		// infinit fractal test
+		// implicit test
+		// triangle mesh test
+		// micro mesh test
+		// lights test
+		// camera test
+
+		if(p_id==0){ // material test
+			_camera = new CameraPerspective(Vec3f(0.f, -15.f, 15.f), Vec3f(0.f, 0.f, 2.f), PIf / 3.f, 1.f, aspectRatio);
 			
-			_objects.push_back(new Plane(Vec3f(0.f, 0.f, 0.f), Vec3f(0., 0., 1.f)));
-			_objects.push_back(new Sphere(Vec3f(0.f, 0.f, 100.f), 30.f));
-			
+			_meshes.push_back(new Plane(Vec3f(0.f, 0.f, 0.f), Vec3f(0., 0., 1.f)));
 			_materials.push_back(new Material(Vec3f(0.5f, 0.5f, 0.5f), VEC3F_ZERO, 0.f, 0.f, 1.f, 0.f, 1.f));
-			_materials.push_back(new Material(Vec3f(1.f, 1.f, 1.f), VEC3F_ONE, 10.f, 0.f, 1.f, 0.f, 1.f));
 			
-			for(int i=0; i<5 ;i++)
-				for(int j=0; j<5 ;j++){
-					_materials.push_back(new Material(Vec3f(randomFloat(), randomFloat(), randomFloat()), VEC3F_ZERO, 0.f, 1.f, 0.3f, 1.f, 1.5f));
-					_objects.push_back(new Sphere(Vec3f(-5.f + i * 2.5f, -5.f + j * 2.5f, 2.f), 1.f));
-				}
+			//_meshes.push_back(new Sphere(Vec3f(0.f, 0.f, 100.f), 30.f));
+			//_materials.push_back(new Material(Vec3f(1.f, 1.f, 1.f), VEC3F_ONE, 10.f, 0.f, 1.f, 0.f, 1.f));
+			_lights.push_back(new SphereLight(Vec3f(0.f, 0.f, 100.f),Vec3f(0.f,0.f,-1.f), VEC3F_ONE, 10.f, 30.f));
+			// => should use light 
+			
+			for(int i=0; i<9 ;i++) {
+				// Dielectric
+				_materials.push_back(new Material(Vec3f(randomFloat(), randomFloat(), randomFloat()), VEC3F_ZERO, 0.f, 0.f, i*0.125f, 0.f, 1.5f));
+				_meshes.push_back(new Sphere(Vec3f(-10.f + i * 2.5f, -7.5f, 2.f), 1.f));
+				
+				// Metalic
+				_materials.push_back(new Material(Vec3f(randomFloat(), randomFloat(), randomFloat()), VEC3F_ZERO, 0.f, 1.f, i*0.125f, 0.f, 1.5f));
+				_meshes.push_back(new Sphere(Vec3f(-10.f + i * 2.5f, -5.f, 2.f), 1.f));
 
-			for(int i=0; i<_objects.size() ;i++)
-				_objects[i]->setMaterial(_materials[i]);
+				// Metalic Anisotropie
+				//_materials.push_back(new Material(Vec3f(randomFloat(), randomFloat(), randomFloat()), VEC3F_ZERO, 0.f, 1.f, i*0.125f, 0.f, 1.5f));
+				//_meshes.push_back(new Sphere(Vec3f(-10.f + i * 2.5f, -2.5f, 2.f), 1.f));
 
-		}else if(p_id==1){
+				// Clear Coat
+				//_materials.push_back(new Material(Vec3f(randomFloat(), randomFloat(), randomFloat()), VEC3F_ZERO, 0.f, 1.f, 0.6f, 0.f, 1.5f));
+				//_meshes.push_back(new Sphere(Vec3f(-10.f + i * 2.5f, 0.f, 2.f), 1.f));
+
+				// Transparent
+				_materials.push_back(new Material(Vec3f(randomFloat(), randomFloat(), randomFloat()), VEC3F_ZERO, 0.f, 0.f, i*0.125f, 1.f, 1.5f));
+				_meshes.push_back(new Sphere(Vec3f(-10.f + i * 2.5f, 2.5f, 2.f), 1.f));
+
+				// Absorbance
+				//_materials.push_back(new Material(VEC3F_ONE, VEC3F_ZERO, 0.f, 0.f, 0.f, 1.f, 1.5f));
+				//_meshes.push_back(new Sphere(Vec3f(-10.f + i * 2.5f, 5.f, 2.f), 1.f));
+
+				// Sheen
+				//_materials.push_back(new Material(Vec3f(randomFloat(), randomFloat(), randomFloat()), VEC3F_ZERO, 0.f, 0.f, i*0.125f, 0.f, 1.5f));
+				//_meshes.push_back(new Sphere(Vec3f(-10.f + i * 2.5f, 7.5f, 2.f), 1.f));
+
+				// Emissive
+				_materials.push_back(new Material(VEC3F_ZERO, Vec3f(randomFloat(), randomFloat(), randomFloat()), i*2.5f, 0.f, 1.f, 0.f, 1.5f));
+				_meshes.push_back(new Sphere(Vec3f(-10.f + i * 2.5f, 10.f, 2.f), 1.f));
+			}
+
+			for(int i=0; i<_meshes.size() ;i++) _meshes[i]->setMaterial(_materials[i]);
+
+		}else if(p_id==1){ // fractal test
 			_camera = new CameraPerspective(Vec3f(0.f, -4.f, 3.f), Vec3f(0.f, 0.f, 1.f), PIf / 3.f, 1.f, aspectRatio);
 
 			_materials.push_back(new Material(Vec3f(1.f, 1.f, 1.f)    , VEC3F_ONE , 5.f, 0.f, 1.f, 0.f, 1.f));
@@ -66,77 +104,82 @@ namespace RT_CPU
 			_materials.push_back(new Material(Vec3f(0.8f, 0.235f, 0.f), VEC3F_ZERO, 0.f, 1.f, 0.5f, 0.f, 1.f));
 			_materials.push_back(new Material(Vec3f(0.f, 0.235f, 0.8f), VEC3F_ZERO, 0.f, 1.f, 0.5f, 0.f, 1.f));
 			
-			_objects.push_back(new Plane(Vec3f(0.f, 0.f, 10.f), Vec3f(0.f, 0.f, -1.f)));
-			_objects.push_back(new Plane(Vec3f(0.f, 0.f, 0.f), Vec3f(0.f, 0.f, 1.f)));
-			_objects.push_back(new Plane(Vec3f(-5.f, 0.f, 0.f), Vec3f(1.f, 0.f, 0.f)));
-			_objects.push_back(new Plane(Vec3f(5.f, 0.f, 0.f), Vec3f(-1.f, 0.f, 0.f)));
-			_objects.push_back(new Plane(Vec3f(0.f, 5.f, 0.f), Vec3f(0.f, -1.f, 0.f)));
-			_objects.push_back(new Plane(Vec3f(0.f, -5.f, 0.f), Vec3f(0.f, 1.f, 0.f)));
-			_objects.push_back(new MandelbulbImplicit(Vec3f(-2.f, 0.f, 1.5f), 8.f));
-			_objects.push_back(new JuliaImplicit(Vec3f(2.f, 0.f, 1.5f), Vec4f(0.f, 0.1f, 1.f, -0.1f)));
+			_meshes.push_back(new Plane(Vec3f(0.f, 0.f, 10.f), Vec3f(0.f, 0.f, -1.f)));
+			_meshes.push_back(new Plane(Vec3f(0.f, 0.f, 0.f), Vec3f(0.f, 0.f, 1.f)));
+			_meshes.push_back(new Plane(Vec3f(-5.f, 0.f, 0.f), Vec3f(1.f, 0.f, 0.f)));
+			_meshes.push_back(new Plane(Vec3f(5.f, 0.f, 0.f), Vec3f(-1.f, 0.f, 0.f)));
+			_meshes.push_back(new Plane(Vec3f(0.f, 5.f, 0.f), Vec3f(0.f, -1.f, 0.f)));
+			_meshes.push_back(new Plane(Vec3f(0.f, -5.f, 0.f), Vec3f(0.f, 1.f, 0.f)));
+			_meshes.push_back(new MandelbulbImplicit(Vec3f(-2.f, 0.f, 1.5f), 1.f, 8.f));
+			_meshes.push_back(new JuliaImplicit(Vec3f(2.f, 0.f, 1.5f), 1.f, Vec4f(0.f, 0.1f, 1.f, -0.1f)));
 
-			_objects[0]->setMaterial(_materials[0]);
-			_objects[1]->setMaterial(_materials[1]);
-			_objects[2]->setMaterial(_materials[2]);
-			_objects[3]->setMaterial(_materials[3]);
-			_objects[4]->setMaterial(_materials[1]);
-			_objects[5]->setMaterial(_materials[1]);
-			_objects[6]->setMaterial(_materials[4]);
-			_objects[7]->setMaterial(_materials[5]);
-		} else if (p_id == 2) {
+			_meshes[0]->setMaterial(_materials[0]);
+			_meshes[1]->setMaterial(_materials[1]);
+			_meshes[2]->setMaterial(_materials[2]);
+			_meshes[3]->setMaterial(_materials[3]);
+			_meshes[4]->setMaterial(_materials[1]);
+			_meshes[5]->setMaterial(_materials[1]);
+			_meshes[6]->setMaterial(_materials[4]);
+			_meshes[7]->setMaterial(_materials[5]);
+
+		} else if (p_id == 2) { // infinite fractal test
 			_camera = new CameraPerspective(Vec3f(-3.f, 1.f, 5.f), Vec3f(-3.f, 0.f, 5.f), PIf / 3.f, 1.f, aspectRatio);
 
 			_materials.push_back(new Material(Vec3f(1.f, 1.f, 1.f), VEC3F_ONE, 20.f, 0.f, 1.f, 0.f, 1.f));
 			_materials.push_back(new Material(Vec3f(0.35f, 0.2f, 0.05f), VEC3F_ZERO, 0.f, 0.75f, 0.5f, 0.f, 1.f));
 
-			_objects.push_back(new Plane(Vec3f(0.f, 0.f, 10.f), Vec3f(0.f,0.f,-1.f)));
-			_objects.push_back(new AppoloniusImplicit(Vec3f(0.f, 0.f, 0.f)));
+			_meshes.push_back(new Plane(Vec3f(0.f, 0.f, 10.f), Vec3f(0.f,0.f,-1.f)));
+			_meshes.push_back(new ApolloniusImplicit(VEC3F_ZERO,1.f));
 
-			for (int i = 0; i < _objects.size();i++)
-				_objects[i]->setMaterial(_materials[i]);
-		} else if (p_id == 3) {
+			for(int i=0; i<_meshes.size() ;i++) _meshes[i]->setMaterial(_materials[i]);
+
+		} else if(p_id == 3) { // triangle mesh test
 			_camera = new CameraPerspective(Vec3f(-3.47f, -1.35f, 1.7f), Vec3f(0.f, 0.f, 0.f), PIf / 3.f, 1.f, aspectRatio);
-			_lights.push_back(new QuadLight(Vec3f(0.f, 0.f, 2.8f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 2.5f, Vec3f(4.f,0.f,0.f), Vec3f(0.f,4.f,0.f)));
-			_materials.push_back(new Material(Vec3f(0.5f, 0.5f, 0.5f), VEC3F_ZERO, 0.f, 0.f, 1.f, 0.f, 1.f));
-			_loadGltf("assets/conference.glb");
-		}else if(p_id == 4) {
-			_camera = new CameraPerspective(Vec3f(-3.47f, -1.35f, 1.7f), Vec3f(0.f, 0.f, 0.f), PIf / 3.f, 1.f, aspectRatio);
+			//_lights.push_back(new QuadLight(Vec3f(0.f, 0.f, 2.8f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 2.5f, Vec3f(4.f, 0.f, 0.f), Vec3f(0.f, 4.f, 0.f)));
+			_lights.push_back(new PonctualLight(Vec3f(0.f, 0.f, 2.8f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 30.f, -PIf, -PIf));
 			_materials.push_back(new Material(Vec3f(0.5f, 0.5f, 0.5f), VEC3F_ZERO, 0.f, 0.f, 1.f, 0.f, 1.f));
 			_loadGltf("assets/conference_dragon_and_bunny.glb");
-		}
+		} else if (p_id == 4) {
+			_camera = new CameraPerspective(Vec3f(0.f, -2.f, 2.f), Vec3f(0.f, 0.f, 1.f), PIf / 3.f, 1.f, aspectRatio);
 
-		else if (p_id == 5) {
-			_camera = new CameraPerspective(Vec3f(0.f, -15.f, 15.f), Vec3f(0.f, -2.f, 2.f), PIf/3.f, 1.f, aspectRatio);
+			//_camera = new CameraPerspective(Vec3f(0.f, -9.f, 9.f), Vec3f(0.f, -2.f, 2.f), PIf / 3.f, 1.f, aspectRatio);
 			//_camera = new CameraOrthographic(Vec3f(0.f, -8.f, 8.f), Vec3f(0.f, -2.f, 2.f), 15.f*aspectRatio,15.f);
 			//_camera = new CameraPanoramic(Vec3f(0.f, -8.f, 8.f), Vec3f(0.f, -2.f, 2.f), 1.f);
 			//_camera = new CameraFisheye(Vec3f(0.f, -8.f, 8.f), Vec3f(0.f, -2.f, 2.f), 1.f);
 
-			_objects.push_back(new Plane(Vec3f(0.f, 0.f, 0.f), Vec3f(0., 0., 1.f)));
-			//_lights.push_back(new DirectionalLight(Vec3f(0.f, 0.f, 0.f), glm::normalize(Vec3f(0.f, -1.f, -1.f)), VEC3F_ONE, 3.f));
-			//_lights.push_back(new PonctualLight(Vec3f(0.f, 0.f, 10.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 300.f, -PIf, -PIf));
-			//_lights.push_back(new PonctualLight(Vec3f(0.f, 0.f, 10.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 300.f, PIf/5.f, PIf/3.f));
-			//_lights.push_back(new QuadLight(Vec3f(0.f, 0.f, 10.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 10.f, Vec3f(4.f,0.f,0.f), Vec3f(0.f,4.f,0.f)));
-			_lights.push_back(new SphereLight(Vec3f(0.f, 0.f, 10.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 10.f, 2.5f));
+			_meshes.push_back(new Plane(Vec3f(0.f, 0.f, 0.f), Vec3f(0., 0., 1.f)));
 			_materials.push_back(new Material(Vec3f(0.5f, 0.5f, 0.5f), VEC3F_ZERO, 0.f, 0.f, 1.f, 0.f, 1.f));
 
-			for (int i = 0; i < 5; i++)
+			//_lights.push_back(new DirectionalLight(Vec3f(0.f, 0.f, 0.f), glm::normalize(Vec3f(0.f, -1.f, -1.f)), VEC3F_ONE, 3.f));
+			_lights.push_back(new PonctualLight(Vec3f(0.f, 0.f, 10.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 300.f, -PIf, -PIf));
+			//_lights.push_back(new PonctualLight(Vec3f(0.f, 0.f, 10.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 300.f, PIf/5.f, PIf/3.f));
+			//_lights.push_back(new QuadLight(Vec3f(0.f, 0.f, 10.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 10.f, Vec3f(4.f,0.f,0.f), Vec3f(0.f,4.f,0.f)));
+			//_lights.push_back(new SphereLight(Vec3f(0.f, 0.f, 100.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 1.f, 30.f));
+
+			/*for (int i = 0; i < 5; i++)
 				for (int j = 0; j < 5; j++) {
-					_materials.push_back(new Material(Vec3f(randomFloat(), randomFloat(), randomFloat()), VEC3F_ZERO, 0.f, 1.f, 0.5f, 0.f, 1.5f));
-					_objects.push_back(new Sphere(Vec3f(-5.f + i * 2.5f, -5.f + j * 2.5f, 2.f), 1.f));
-				}
+					_materials.push_back(new Material(Vec3f(randomFloat(), randomFloat(), randomFloat()), VEC3F_ZERO, 0.f, 0.f, 0.f, 0.f, 1.5f));
+					_meshes.push_back(new Sphere(Vec3f(-5.f + i * 2.5f, -5.f + j * 2.5f, 2.f), 1.f));
+				}*/
 
-			for (int i = 0; i < _objects.size(); i++)
-				_objects[i]->setMaterial(_materials[i]);
+			_materials.push_back(new Material(Vec3f(0.5f)+0.5f*Vec3f(randomFloat(), randomFloat(), randomFloat()), VEC3F_ZERO, 0.f, 0.f, 1.f, 0.f, 1.5f));
+			//_meshes.push_back(new SierpinskiImplicit(Vec3f(0.f,0.f,1.f),1.f));
+			_meshes.push_back(new JuliaImplicit(Vec3f(0.f,0.f,1.f), 1.f, Vec4f(0.f, 0.1f, 1.f, -0.1f))); // probleme
+			//_meshes.push_back(new MandelbulbImplicit(Vec3f(0.f,0.f,1.f), 1.f, 3.f));
+			//_meshes.push_back(new MengerImplicit(Vec3f(0.f,0.f,1.f), 1.f));
+			//_meshes.push_back(new ApolloniusImplicit(Vec3f(0.f,0.f,0.f), 1.f));
 
+			for(int i=0; i<_meshes.size() ;i++) _meshes[i]->setMaterial(_materials[i]);
+						
 		}
 
-		_bvh.build(&_objects);
+		_bvh.build(&_meshes);
 	}
 
 	Scene::~Scene(){
 		delete _camera;
 		for(unsigned int i=0; i<_lights.size() ;i++) delete _lights[i];
-		for(unsigned int i=0; i<_objects.size() ;i++) delete _objects[i];
+		for(unsigned int i=0; i<_meshes.size() ;i++) delete _meshes[i];
 		for(unsigned int i=0; i<_materials.size() ;i++) delete _materials[i];
 	}
 
@@ -179,8 +222,8 @@ namespace RT_CPU
 		std::cout << "materials loaded: " << _materials.size() - startIdMaterials << std::endl;
 
 		// ------------- MESHES
-		unsigned int startIdObjects = (unsigned int)_objects.size();
-		_objects.reserve(startIdObjects + model.meshes.size());
+		unsigned int startIdObjects = (unsigned int)_meshes.size();
+		_meshes.reserve(startIdObjects + model.meshes.size());
 		for (tinygltf::Mesh m : model.meshes) {
 			for (tinygltf::Primitive p : m.primitives) {
 				if (p.indices == -1) throw std::runtime_error("Fail to load file: primitive indices must be define.");
@@ -221,11 +264,11 @@ namespace RT_CPU
 					normals.push_back(glm::normalize(glm::make_vec3(&normalsBuffer[i * 3])));
 				}
 
-				_objects.push_back(new TriangleMesh(positions,normals,indices));
-				_objects[_objects.size()-1]->setMaterial(_materials[(p.material == -1) ? 0 : startIdMaterials + p.material]);
+				_meshes.push_back(new TriangleMesh(positions,normals,indices));
+				_meshes[_meshes.size()-1]->setMaterial(_materials[(p.material == -1) ? 0 : startIdMaterials + p.material]);
 			}
 		}
-		std::cout << "objects loaded: " << _objects.size() - startIdObjects << std::endl;
+		std::cout << "meshes loaded: " << _meshes.size() - startIdObjects << std::endl;
 
 		std::cout << "Finished to load " << p_path << std::endl;
 	}

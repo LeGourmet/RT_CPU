@@ -10,7 +10,6 @@
 
 using namespace RT_CPU;
 
-//#define RENDERING_DIRECT_LIGHTING
 #include "renderer/renderer.hpp"
 
 int main(int argc, char** argv)
@@ -23,7 +22,7 @@ int main(int argc, char** argv)
 		Image img = Image(imgWidth, imgHeight);
 
 		Scene scene = Scene(img, 0);
-		Renderer renderer = Renderer(64);
+		Renderer renderer = Renderer(8,12);
 
 		// Launch rendering.
 		std::cout << "Rendering..." << std::endl;

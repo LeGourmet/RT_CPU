@@ -5,7 +5,7 @@
 #include "ray/hit_record.hpp"
 
 #include "scene/scene.hpp"
-#include "scene/objects/object.hpp"
+#include "scene/meshes/mesh.hpp"
 #include "scene/lights/light.hpp"
 #include "scene/lights/light_sample.hpp"
 
@@ -18,7 +18,7 @@ namespace RT_CPU
 	class Renderer
 	{
 	public:
-		Renderer(int p_nbPixelSamples = 1) : _nbPixelSamples(p_nbPixelSamples) {}
+		Renderer(int p_nbPixelSamples, int p_nbBounceMax = 10) : _nbPixelSamples(p_nbPixelSamples), _nbBounceMax(p_nbBounceMax) {}
 		~Renderer() {}
 
 		void renderImage(const Scene& p_scene, Image& p_texture) {
@@ -78,24 +78,6 @@ namespace RT_CPU
 	private:
 		Vec3f _trace(const Scene& p_scene, const Ray& p_ray, const float p_near, const float p_far) {
 			Vec3f finalColor = VEC3F_ZERO;
-
-			#ifdef RENDERING_DIRECT_LIGHTING
-			HitRecord hitRecord;
-			if (p_scene.intersect(p_ray, p_near, p_far, hitRecord)) {
-				for (Light* light : p_scene.getLights()) {
-					Vec3f lightRadiosity = VEC3F_ZERO;
-					for (int i = 0; i < light->getNbShadowRay();i++) {
-						LightSample lightSample = light->sample(hitRecord._point);
-						Ray shadowRay = Ray(hitRecord._point, lightSample._direction);
-						shadowRay.offset(hitRecord._normal);
-
-						if(glm::dot(hitRecord._normal,shadowRay.getDirection())>0.f && glm::dot(hitRecord._normal,-p_ray.getDirection())>0.f && !p_scene.intersectAny(shadowRay,1e-2f,lightSample._distance))
-							lightRadiosity += lightSample._radiance * hitRecord._object->getMaterial()->evaluateBRDF(-p_ray.getDirection(), hitRecord._normal, lightSample._direction) / glm::max(1e-5f,lightSample._pdf);
-					}
-					finalColor += lightRadiosity / (float)light->getNbShadowRay();
-				}
-			}
-			#else
 			Vec3f rayColor = VEC3F_ONE;
 			Ray currentRay = p_ray;
 
@@ -105,27 +87,29 @@ namespace RT_CPU
 			for(int i=0; i<_nbBounceMax ;i++) {
 				HitRecord hitRecord;
 				if (p_scene.intersect(currentRay, p_near, p_far, hitRecord)) {
-					no = ((inside) ? 1.f : hitRecord._object->getMaterial()->getIOR());
+					no = ((inside) ? 1.f : hitRecord._mesh->getMaterial()->getIOR());
 					
-					/*Vec3f directLighting = VEC3F_ZERO;
 					for (Light* light : p_scene.getLights()) {
-						LightSample lightSample = light->sample(hitRecord._point,0);
-						Ray shadowRay = Ray(hitRecord._point, lightSample._direction);
-						shadowRay.offset(hitRecord._normal);
+						Vec3f lightRadiosity = VEC3F_ZERO;
+						for (int i = 0; i < light->getNbShadowRay();i++) {
+							LightSample lightSample = light->sample(hitRecord._point, i);
+							Ray shadowRay = Ray(hitRecord._point, lightSample._direction);
+							shadowRay.offset(hitRecord._normal);
 
-						if (glm::dot(hitRecord._normal, shadowRay.getDirection()) > 0.f && glm::dot(hitRecord._normal, -p_ray.getDirection()) > 0.f && !p_scene.intersectAny(shadowRay, 1e-2, lightSample._distance))
-							directLighting += lightSample._radiance * hitRecord._object->getMaterial()->evaluateBRDF(-p_ray.getDirection(), hitRecord._normal, lightSample._direction) / glm::max(1e-5f, lightSample._pdf);
+							if (inside) break;
+							if (glm::dot(hitRecord._normal, shadowRay.getDirection()) > 0.f && glm::dot(hitRecord._normal, -currentRay.getDirection()) > 0.f && !p_scene.intersectAny(shadowRay, 0.f, lightSample._distance))
+								lightRadiosity += lightSample._radiance * hitRecord._mesh->getMaterial()->evaluateBRDF(-currentRay.getDirection(), hitRecord._normal, lightSample._direction, ni, no) / glm::max(1e-5f, lightSample._pdf);
+						}
+						finalColor += rayColor * lightRadiosity / (float)light->getNbShadowRay();
 					}
 
-					finalColor += directLighting;*/
-
-					finalColor += hitRecord._object->getMaterial()->getEmissivity()*rayColor;
-					currentRay = hitRecord._object->getMaterial()->evaluateWeightedBSDF(currentRay,hitRecord,ni,no,rayColor);
+					finalColor += hitRecord._mesh->getMaterial()->getEmissivity()*rayColor;
+					currentRay = hitRecord._mesh->getMaterial()->evaluateWeightedBSDF(currentRay,hitRecord,ni,no,rayColor);
 					
 					if (rayColor.x == 0.f && rayColor.y == 0.f && rayColor.z == 0.f) break;
 
 					if (glm::dot(hitRecord._normal, currentRay.getDirection()) < 0.f) {
-						ni = ((inside) ? 1.f : hitRecord._object->getMaterial()->getIOR());
+						ni = ((inside) ? 1.f : hitRecord._mesh->getMaterial()->getIOR());
 						inside = !inside;
 					}
 				}
@@ -134,14 +118,13 @@ namespace RT_CPU
 					break;
 				}
 			}
-			#endif
 
 			return finalColor;
 		}
 
 	private:
 		int	_nbPixelSamples;
-		int	_nbBounceMax = 10;
+		int	_nbBounceMax;
 	};
 }
 

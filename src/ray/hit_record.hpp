@@ -5,16 +5,16 @@
 
 namespace RT_CPU
 {
-	class Object;
+	class Mesh;
 
 	struct HitRecord
 	{
-		void faceNormal( const Vec3f p_direction ) { _normal = glm::dot( p_direction, _normal ) < 0. ? _normal : -_normal; }
+		void faceNormal( const Vec3f p_direction ) { if(glm::dot(p_direction,_normal)>0.f) _normal = -_normal; }
 
 		Vec3f			_point		= VEC3F_ZERO;
-		Vec3f			_normal		= VEC3F_Y;
+		Vec3f			_normal		= VEC3F_Z;
 		float			_distance	= FLOAT_MAX;
-		const Object*	_object		= nullptr;
+		const Mesh*		_mesh		= nullptr;
 	};
 }
 
