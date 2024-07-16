@@ -97,7 +97,7 @@ namespace RT_CPU
 							shadowRay.offset(hitRecord._normal);
 
 							if (inside) break;
-							if (glm::dot(hitRecord._normal, shadowRay.getDirection()) > 0.f && glm::dot(hitRecord._normal, -currentRay.getDirection()) > 0.f && !p_scene.intersectAny(shadowRay, 0.f, lightSample._distance))
+							if (glm::dot(hitRecord._normal, shadowRay.getDirection()) > 0.f && glm::dot(hitRecord._normal, -currentRay.getDirection()) > 0.f && !p_scene.intersectAny(shadowRay, p_near, lightSample._distance-p_near))
 								lightRadiosity += lightSample._radiance * hitRecord._mesh->getMaterial()->evaluateBRDF(-currentRay.getDirection(), hitRecord._normal, lightSample._direction, ni, no) / glm::max(1e-5f, lightSample._pdf);
 						}
 						finalColor += rayColor * lightRadiosity / (float)light->getNbShadowRay();

@@ -55,9 +55,9 @@ namespace RT_CPU
 			
 			//_meshes.push_back(new Sphere(Vec3f(0.f, 0.f, 100.f), 30.f));
 			//_materials.push_back(new Material(Vec3f(1.f, 1.f, 1.f), VEC3F_ONE, 10.f, 0.f, 1.f, 0.f, 1.f));
-			_lights.push_back(new SphereLight(Vec3f(0.f, 0.f, 100.f),Vec3f(0.f,0.f,-1.f), VEC3F_ONE, 10.f, 30.f));
-			// => should use light 
-			
+			//_lights.push_back(new SphereLight(Vec3f(0.f, 0.f, 100.f),Vec3f(0.f,0.f,-1.f), VEC3F_ONE, 1.f, 30.f));
+			_lights.push_back(new QuadLight(Vec3f(0.f, 0.f, 100.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 100.f, Vec3f(10.f,0.f,0.f), Vec3f(0.f,10.f,0.f)));
+
 			for(int i=0; i<9 ;i++) {
 				// Dielectric
 				_materials.push_back(new Material(Vec3f(randomFloat(), randomFloat(), randomFloat()), VEC3F_ZERO, 0.f, 0.f, i*0.125f, 0.f, 1.5f));
@@ -88,7 +88,7 @@ namespace RT_CPU
 				//_meshes.push_back(new Sphere(Vec3f(-10.f + i * 2.5f, 7.5f, 2.f), 1.f));
 
 				// Emissive
-				_materials.push_back(new Material(VEC3F_ZERO, Vec3f(randomFloat(), randomFloat(), randomFloat()), i*2.5f, 0.f, 1.f, 0.f, 1.5f));
+				_materials.push_back(new Material(VEC3F_ONE, Vec3f(randomFloat(), randomFloat(), randomFloat()), i*2.5f, 0.f, 1.f, 0.f, 1.5f));
 				_meshes.push_back(new Sphere(Vec3f(-10.f + i * 2.5f, 10.f, 2.f), 1.f));
 			}
 
@@ -135,8 +135,8 @@ namespace RT_CPU
 
 		} else if(p_id == 3) { // triangle mesh test
 			_camera = new CameraPerspective(Vec3f(-3.47f, -1.35f, 1.7f), Vec3f(0.f, 0.f, 0.f), PIf / 3.f, 1.f, aspectRatio);
-			_lights.push_back(new QuadLight(Vec3f(0.f, 0.f, 2.8f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 2.5f, Vec3f(4.f, 0.f, 0.f), Vec3f(0.f, 4.f, 0.f)));
-			//_lights.push_back(new PonctualLight(Vec3f(0.f, 0.f, 2.8f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 30.f, -PIf, -PIf));
+			//_lights.push_back(new QuadLight(Vec3f(0.f, 0.f, 2.8f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 2.5f, Vec3f(4.f, 0.f, 0.f), Vec3f(0.f, 4.f, 0.f)));
+			_lights.push_back(new PonctualLight(Vec3f(0.f, 0.f, 2.8f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 30.f, -PIf, -PIf));
 			_materials.push_back(new Material(Vec3f(0.5f, 0.5f, 0.5f), VEC3F_ZERO, 0.f, 0.f, 1.f, 0.f, 1.f));
 			_loadGltf("assets/conference_dragon_and_bunny.glb");
 		} else if (p_id == 4) {
@@ -151,9 +151,9 @@ namespace RT_CPU
 			_materials.push_back(new Material(Vec3f(0.5f, 0.5f, 0.5f), VEC3F_ZERO, 0.f, 0.f, 1.f, 0.f, 1.f));
 
 			//_lights.push_back(new DirectionalLight(Vec3f(0.f, 0.f, 0.f), glm::normalize(Vec3f(0.f, -1.f, -1.f)), VEC3F_ONE, 3.f));
-			_lights.push_back(new PonctualLight(Vec3f(0.f, 0.f, 10.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 300.f, -PIf, -PIf));
+			//_lights.push_back(new PonctualLight(Vec3f(0.f, 0.f, 10.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 300.f, -PIf, -PIf));
 			//_lights.push_back(new PonctualLight(Vec3f(0.f, 0.f, 10.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 300.f, PIf/5.f, PIf/3.f));
-			//_lights.push_back(new QuadLight(Vec3f(0.f, 0.f, 10.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 10.f, Vec3f(4.f,0.f,0.f), Vec3f(0.f,4.f,0.f)));
+			_lights.push_back(new QuadLight(Vec3f(0.f, 0.f, 10.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 10.f, Vec3f(4.f,0.f,0.f), Vec3f(0.f,4.f,0.f)));
 			//_lights.push_back(new SphereLight(Vec3f(0.f, 0.f, 100.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 1.f, 30.f));
 
 			/*for (int i = 0; i < 5; i++)
