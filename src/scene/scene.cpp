@@ -29,6 +29,7 @@
 #include "scene/lights/basic/ponctual_light.hpp"
 #include "scene/lights/basic/directional_light.hpp"
 #include "scene/lights/surfacic/quad_light.hpp"
+#include "scene/lights/surfacic/disk_light.hpp"
 #include "scene/lights/volumic/sphere_light.hpp"
 
 #include <iostream>
@@ -49,14 +50,10 @@ namespace RT_CPU
 
 		if(p_id==0){ // material test
 			_camera = new CameraPerspective(Vec3f(0.f, -15.f, 15.f), Vec3f(0.f, 0.f, 2.f), PIf / 3.f, 1.f, aspectRatio);
+			_lights.push_back(new QuadLight(Vec3f(0.f, 0.f, 50.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 100.f, Vec3f(10.f,0.f,0.f), Vec3f(0.f,10.f,0.f)));
 			
 			_meshes.push_back(new Plane(Vec3f(0.f, 0.f, 0.f), Vec3f(0., 0., 1.f)));
 			_materials.push_back(new Material(Vec3f(0.5f, 0.5f, 0.5f), VEC3F_ZERO, 0.f, 0.f, 1.f, 0.f, VEC3F_ZERO, 0.f, 1.f));
-			
-			//_meshes.push_back(new Sphere(Vec3f(0.f, 0.f, 100.f), 30.f));
-			//_materials.push_back(new Material(Vec3f(1.f, 1.f, 1.f), VEC3F_ONE, 10.f, 0.f, 1.f, 0.f, 1.f));
-			//_lights.push_back(new SphereLight(Vec3f(0.f, 0.f, 100.f),Vec3f(0.f,0.f,-1.f), VEC3F_ONE, 1.f, 30.f));
-			//_lights.push_back(new QuadLight(Vec3f(0.f, 0.f, 50.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 100.f, Vec3f(10.f,0.f,0.f), Vec3f(0.f,10.f,0.f)));
 
 			for(int i=0; i<9 ;i++) {
 				// Dielectric
@@ -150,10 +147,11 @@ namespace RT_CPU
 			_meshes.push_back(new Plane(Vec3f(0.f, 0.f, 0.f), Vec3f(0., 0., 1.f)));
 			_materials.push_back(new Material(Vec3f(0.5f, 0.5f, 0.5f), VEC3F_ZERO, 0.f, 0.f, 1.f, 0.f, VEC3F_ZERO, 0.f, 1.f));
 
-			_lights.push_back(new DirectionalLight(Vec3f(0.f, 0.f, 0.f), glm::normalize(Vec3f(0.3f, -0.7f, -0.4f)), VEC3F_ONE, 3.f));
+			//_lights.push_back(new DirectionalLight(Vec3f(0.f, 0.f, 0.f), glm::normalize(Vec3f(0.3f, -0.7f, -0.4f)), VEC3F_ONE, 3.f));
 			//_lights.push_back(new PonctualLight(Vec3f(0.f, 0.f, 10.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 300.f, -PIf, -PIf));
 			//_lights.push_back(new PonctualLight(Vec3f(0.f, 0.f, 10.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 300.f, PIf/5.f, PIf/3.f));
 			//_lights.push_back(new QuadLight(Vec3f(0.f, 0.f, 10.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 10.f, Vec3f(4.f,0.f,0.f), Vec3f(0.f,4.f,0.f)));
+			_lights.push_back(new DiskLight(Vec3f(0.f, 0.f, 10.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 10.f, 4.f));
 			//_lights.push_back(new SphereLight(Vec3f(0.f, 0.f, 100.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 1.f, 30.f));
 
 			for (int i = 0; i < 5; i++)

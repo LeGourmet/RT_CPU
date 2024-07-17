@@ -22,7 +22,7 @@ int main(int argc, char** argv)
 		Image img = Image(imgWidth, imgHeight);
 
 		Scene scene = Scene(img, 4);
-		Renderer renderer = Renderer(4,12);
+		Renderer renderer = Renderer(1,1);
 
 		// Launch rendering.
 		std::cout << "Rendering..." << std::endl;

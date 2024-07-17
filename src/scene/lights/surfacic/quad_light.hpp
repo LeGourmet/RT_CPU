@@ -7,6 +7,13 @@
 namespace RT_CPU
 {
 
+	/*
+	float phi = (_direction.x==0.f) ? PI_2f : glm::atan(_direction.y/_direction.x);
+	float theta = glm::acos(_direction.z);
+			
+	Vec3f dir = Vec3f(glm::sin(theta) * glm::cos(phi), glm::sin(theta) * glm::sin(phi), glm::cos(theta));
+	*/
+
 	class QuadLight : public SurfacicLight{
 	  public:
 		// len(cross(a,b)) = len(a) * len(b) * sin(a^b)   ==>   area = L * H * sin(u^v)

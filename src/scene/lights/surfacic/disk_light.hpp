@@ -13,27 +13,15 @@ namespace RT_CPU
 			: SurfacicLight(p_position, p_direction, p_color, p_power, PIf*p_radius*p_radius, p_nbShadowRay), _radius(p_radius) {}
 		~DiskLight() {}
 
-		/*
-		Interaction Disk::Sample(const Point2f &u) const {
-			Point2f pd = ConcentricSampleDisk(u);
-			Point3f pObj(pd.x * radius, pd.y * radius, height);
-			Interaction it;
-			it.n = Normalize((*ObjectToWorld)(Normal3f(0, 0, 1)));
-			if (reverseOrientation) it.n *= -1;
-			it.p = (*ObjectToWorld)(pObj, Vector3f(0, 0, 0), &it.pError);
-			return it;
-		}
-		*/
-
 		inline virtual LightSample sample(const Vec3f& p_point, const int p_i) const override {
 			// todo stratified sampling
 			
-			float theta = randomFloat() * TWO_PIf;
+			//float phi = randomFloat() * TWO_PIf; // twoPI/sqrt(nbShadowRay)
+			float phi = (randomFloat()+p_i) * TWO_PIf/_nbShadowRay;
 			float r = _radius * glm::max(1e-5f, glm::sqrt(randomFloat()));
-			
-			Vec2f frag2D = Vec2f(r*glm::cos(theta), r*glm::sin(theta));
-			Vec3f frag = VEC3F_ZERO;
 
+			Vec3f frag = r*Vec3f(glm::cos(phi), glm::sin(phi), 0.f)+_position;
+			
 			// todo rotate with direction
 
 			Vec3f vec = frag - p_point;
@@ -46,13 +34,11 @@ namespace RT_CPU
 		}
 
 		inline LightSample sample(const Vec3f& p_point) const override {
-			float theta = randomFloat()* TWO_PIf;
+			float phi = randomFloat()* TWO_PIf;
 			float r = _radius * glm::max(1e-5f, glm::sqrt(randomFloat()));
 			
-			// todo compute frag
-			Vec3f frag2D = Vec3f(r*glm::cos(theta), r*glm::sin(theta), 0.f);
-			Vec3f frag = VEC3F_ZERO;
-
+			Vec3f frag = r*Vec3f(glm::cos(phi), glm::sin(phi), 0.f)+_position;
+			
 			// todo rotate with direction
 
 			Vec3f vec = frag - p_point;

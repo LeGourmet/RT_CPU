@@ -53,7 +53,6 @@ Plusieurs ajouts sont en vue pour la géométrie dans ce moteur :
 Des modifications au niveau des objets peuplant la scène sont à prévoir :
 - l'ajout des nouveaux type de caméra : panoramique, fisheye
 - l'ajout d'un profile de lumière pour la ponctual light (Goniophotometric Diagram Map / IES profile)
-- l'ajout d'un paramètre de jittering pour la directional light
 - refactor la quad light (use u,v,w coordinate)
 - l'ajout d'un nouveau type de surfacique light : disk
 - refactor la sphere light (use inner and outer angle)
