@@ -5,6 +5,7 @@
 
 namespace RT_CPU
 {
+	// blender export or gltf need multiply by 1.f/683.f
 
 	class DirectionalLight : public BasicLight
 	{
@@ -14,11 +15,21 @@ namespace RT_CPU
 		~DirectionalLight() {}
 
 		LightSample sample(const Vec3f& p_point) const override {
-			return LightSample(_color*_power, -_direction, FLT_MAX, 1.f);
-		}
-	};
+			float phi = (_direction.x==0.f) ? PI_2f : glm::atan(_direction.y/_direction.x);
+			float theta = glm::acos(-_direction.z);
+			
 
-	// float jittering
+			phi += rand()* _jittering;
+			theta += rand()* _jittering;
+
+			Vec3f dir = Vec3f(glm::sin(theta) * glm::cos(phi), glm::sin(theta) * glm::sin(phi), glm::cos(theta));
+
+			return LightSample(_color*_power, dir, FLT_MAX, 1.f);
+		}
+
+	  private:
+		float _jittering = 0.f * 0.00001f;
+	};
 }
 
 #endif

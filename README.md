@@ -71,5 +71,5 @@ Des modifications au niveau des objets peuplant la scène sont à prévoir :
 - la gestion de graph de scène et d'instancing
 - l'amélioration de la méthode de rendu par l'utilisation de NEE et de bidirectional path tracing
 - la gestion des textures (albedo, normal, metalness/roughness/transmitness)
-- l'amélioration de la BSDF (ajout clearcoat, sheen, anisotropie, ggx mutiscatering/energie compensation, translucence, iridescence, absorbance, alpha)
+- l'amélioration de la BSDF (ajout clearcoat, sheen, anisotropie, ggx mutiscatering/energie compensation, translucence, iridescence, absorbance, scattering, alpha)
 - l'ajout d'effets de post-processing (AgX, denoiser)

@@ -103,6 +103,7 @@ namespace RT_CPU
 						finalColor += rayColor * lightRadiosity / (float)light->getNbShadowRay();
 					}
 
+					if(inside) rayColor *= hitRecord._mesh->getMaterial()->getAbsoptivity(hitRecord._distance);
 					finalColor += hitRecord._mesh->getMaterial()->getEmissivity()*rayColor;
 					currentRay = hitRecord._mesh->getMaterial()->evaluateWeightedBSDF(currentRay,hitRecord,ni,no,rayColor);
 					

@@ -6,7 +6,7 @@
 namespace RT_CPU
 {
 
-	// blender export or gltf need divide by /683.f
+	// blender export or gltf need multiply by 4.f*PI/683.f => (lm/steradian)
 
 	class PonctualLight : public BasicLight
 	{

@@ -17,12 +17,13 @@ namespace RT_CPU
     {
     public:
         // --------------------------------------------- DESTRUCTOR / CONSTRUCTOR ----------------------------------------------
-        Material(const Vec3f& p_baseColor, const Vec3f& p_emissiveColor, float p_emissiveStrength, float p_metalness, float p_roughness, float p_transmitness, float p_ior) :
-            _baseColor(p_baseColor), _emissiveColor(p_emissiveColor), _emissiveStrength(p_emissiveStrength), _metalness(p_metalness), _roughness(p_roughness), _transmitness(p_transmitness), _ior(p_ior) { }
+        Material(const Vec3f& p_baseColor, const Vec3f& p_emissiveColor, float p_emissiveStrength, float p_metalness, float p_roughness, float p_transmitness, const Vec3f& p_absorptionColor, float p_absorptionDensity, float p_ior) :
+            _baseColor(p_baseColor), _emissiveColor(p_emissiveColor), _emissiveStrength(p_emissiveStrength), _metalness(p_metalness), _roughness(p_roughness), _transmitness(p_transmitness), _absorptionColor(p_absorptionColor), _absorptionDensity(p_absorptionDensity), _ior(p_ior) { }
         ~Material() {}
 
         inline const float getIOR() const { return _ior; }
         inline const Vec3f getEmissivity() const { return _emissiveColor*_emissiveStrength; }
+        inline const Vec3f getAbsoptivity(float p_d) const { return glm::exp(-(1.f-_absorptionColor)*_absorptionDensity*p_d); }      
 
         /*
         // https://pbr-book.org/3ed-2018/Monte_Carlo_Integration/Importance_Sampling
@@ -133,6 +134,40 @@ namespace RT_CPU
         }*/
 
         Ray evaluateWeightedBSDF(const Ray& p_ray, const HitRecord& p_hitRecord, float p_ni, float p_no, Vec3f& p_rayColor) {
+            /*
+            Vec4f albedo = getAlbedo(p_hitRecord._uv.x, p_hitRecord._uv.y);
+           
+            float metalness = _metalness;
+            float roughness = _roughness;
+            if (_metalnessRoughnessMap != nullptr) {
+                Vec4f tmp = _metalnessRoughnessMap->sample(p_hitRecord._uv.x, p_hitRecord._uv.y);
+                metalness = tmp.z;
+                roughness = tmp.y;
+            }
+            roughness = glm::clamp(roughness, 0.01f, 0.99f);
+            float r = roughness * roughness;
+            float r2 = r * r;
+            
+            float transmitness = _transmitness;
+            if (_transmitnessMap != nullptr) {
+                Vec4f tmp = _transmitnessMap->sample(p_hitRecord._uv.x, p_hitRecord._uv.y);
+                transmitness *= tmp.r;
+            }
+            
+            Vec3f V = -p_ray.getDirection();
+            Vec3f N = p_hitRecord._normal;
+            if (_normalMap != nullptr) {
+                float s = (N.z>=0.) ? 1.f : -1.f;
+                float a = -1.f/(s+N.z);
+                float b = N.x*N.y*a;
+                Vec3f T = Vec3f(1.f+s*N.x*N.x*a, s*b, -s*N.x);
+                Vec3f B = Vec3f(b, s+N.y*N.y*a, -N.y);
+
+                Vec4f tmp = _normalMap->sample(p_hitRecord._uv.x, p_hitRecord._uv.y);
+                N = glm::normalize((tmp.x*2.f-1.f)*T + (tmp.y*2.f-1.f)*B + (tmp.z*2.f-1.f)*N);
+            }
+            */
+            
             float roughness = glm::clamp(_roughness, 0.01f, 0.99f);
             float r = roughness * roughness;
             float r2 = r * r;
@@ -149,6 +184,13 @@ namespace RT_CPU
             float specularRefractionRate = _transmitness * (1.f - _metalness) * (1.f - DielF);
             float GlobalRate = randomFloat();
                         
+            // --- alpha ---
+            /*if (_alphaCutoff != 0.f && !(_alphaCutoff == 1.f && randomFloat() < albedo.a) && _alphaCutoff >= albedo.a) {
+                Ray alphaRay = Ray(p_hitRecord._point, p_ray.getDirection());
+                alphaRay.offset(-p_hitRecord._normal);
+                return alphaRay;
+            }*/
+
             // --- specular refraction ---
             if (GlobalRate <= specularRefractionRate) {
                 Vec3f refractRayDir = glm::refract(p_ray.getDirection(), H, p_ni / p_no);
@@ -238,14 +280,50 @@ namespace RT_CPU
 
     private:
         // ----------------------------------------------------- ATTRIBUTS -----------------------------------------------------
-        Vec3f _baseColor = VEC3F_ONE;
-        Vec3f _emissiveColor = VEC3F_ZERO;
+        Vec3f _baseColor                = VEC3F_ONE;       //Vec4f _baseColor = VEC4F_ONE; 
+        //float _alphaCutoff = 0.f;
         
-        float _emissiveStrength = 0.f;
-        float _metalness = 0.f;
-        float _roughness = 1.f;
-        float _transmitness = 0.f;
+        Vec3f _emissiveColor            = VEC3F_ZERO;
+        float _emissiveStrength         = 0.f;
+        
+        float _metalness                = 0.f;
+        float _roughness                = 1.f;
+        float _transmitness             = 0.f;
+        
+        // https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_materials_clearcoat/README.md
+        //float _coatness               = 0.f;
+        //float _coatRoughness          = 1.f;
+        //float _coatIor                = 1.5f;
+        //Vec3f _coatTint               = VEC3F_ONE;
+        
+        // https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_materials_sheen/README.md
+        //float _sheenness              = 0.f; // _sheeness = 0 if _sheenColor = VEC3F_ZERO and 1.f else
+        //float _sheenRoughness         = 1.f;
+        //Vec3f _sheenColor             = VEC3F_ONE;
+
+        // https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_materials_anisotropy/README.md
+        //float _anisotropy             = 0.f; // (anisotropy strength)
+        //float _anisotropyRotation     = 0.f; // (anisotropie rotation)
+
+        Vec3f _absorptionColor          = VEC3F_ONE;
+        float _absorptionDensity        = 0.f;      // == 1.f/absorptionDistance
+
         float _ior = 1.f;
+
+        /*
+        Texture* _baseColorMap          = nullptr;
+        Texture* _metalnessRoughnessMap = nullptr;  // sould merge MetalnessRoughnessTransmitnessMap
+        Texture* _transmitnessMap       = nullptr;  // should be merge with MetalRoughnessMap
+        Texture* _normalMap             = nullptr;  // +normal map scale
+        Texture* _occlusionMap          = nullptr;  // should be not used
+        Texture* _emissiveMap           = nullptr;
+        Texture* _anisotropyMap         = nullptr;  // (red and green => direction t and b and blue the anisotropyStrength to multiply by anisotropy)
+        Texture* _coatMap               = nullptr;  // clearcoat = clearcoatFactor * clearcoatTexture.r
+        Texture* _coatRougnessMap       = nullptr;  // clearcoatRoughness = clearcoatRoughnessFactor * clearcoatRoughnessTexture.g
+        Texture* _coatNormalMap         = nullptr; 
+        Texture* _sheenColorMap         = nullptr;  // sheenColor = sheenColorFactor * sampleLinear(sheenColorTexture).rgb
+        Texture* _sheenRougnessMap      = nullptr;  // sheenRoughness = sheenRoughnessFactor * sample(sheenRoughnessTexture).a
+        */
     };
 }
 
