@@ -147,16 +147,17 @@ namespace RT_CPU
 			_meshes.push_back(new Plane(Vec3f(0.f, 0.f, 0.f), Vec3f(0., 0., 1.f)));
 			_materials.push_back(new Material(Vec3f(0.5f, 0.5f, 0.5f), VEC3F_ZERO, 0.f, 0.f, 1.f, 0.f, VEC3F_ZERO, 0.f, 1.f));
 
-			//_lights.push_back(new DirectionalLight(Vec3f(0.f, 0.f, 0.f), glm::normalize(Vec3f(0.3f, -0.7f, -0.4f)), VEC3F_ONE, 3.f));
+			//_lights.push_back(new DirectionalLight(Vec3f(0.f, 0.f, 0.f), glm::normalize(Vec3f(0.f,0.f,-1.f)), VEC3F_ONE, 3.f, PIf/10.f));
 			//_lights.push_back(new PonctualLight(Vec3f(0.f, 0.f, 10.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 300.f, -PIf, -PIf));
 			//_lights.push_back(new PonctualLight(Vec3f(0.f, 0.f, 10.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 300.f, PIf/5.f, PIf/3.f));
-			//_lights.push_back(new QuadLight(Vec3f(0.f, 0.f, 10.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 10.f, Vec3f(4.f,0.f,0.f), Vec3f(0.f,4.f,0.f)));
-			_lights.push_back(new DiskLight(Vec3f(0.f, 0.f, 10.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 10.f, 4.f));
-			//_lights.push_back(new SphereLight(Vec3f(0.f, 0.f, 100.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 1.f, 30.f));
+			_lights.push_back(new QuadLight(Vec3f(0.f, 0.f, 10.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 300.f, Vec2f(4.f,0.f), Vec2f(4.f,0.f)));
+			//_lights.push_back(new DiskLight(Vec3f(0.f, 0.f, 10.f), glm::normalize(Vec3f(0.f, 0.f, 1.f)), VEC3F_ONE, 10.f, 4.f));
+			//_lights.push_back(new SphereLight(Vec3f(0.f, 0.f, 10.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 3.f, 4.f, -PIf, -PIf));
+			//_lights.push_back(new SphereLight(Vec3f(0.f, 0.f, 10.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 3.f, 4.f, PIf/5.f, PIf/3.f));
 
 			for (int i = 0; i < 5; i++)
 				for (int j = 0; j < 5; j++) {
-					_materials.push_back(new Material(Vec3f(randomFloat(), randomFloat(), randomFloat()), VEC3F_ZERO, 0.f, 0.f, 0.f, 0.f, VEC3F_ZERO, 0.f, 1.5f));
+					_materials.push_back(new Material(Vec3f(randomFloat(), randomFloat(), randomFloat()), VEC3F_ZERO, 0.f, 1.f, 0.1f, 0.f, VEC3F_ZERO, 0.f, 1.5f));
 					_meshes.push_back(new Sphere(Vec3f(-5.f + i * 2.5f, -5.f + j * 2.5f, 2.f), 1.f));
 				}
 

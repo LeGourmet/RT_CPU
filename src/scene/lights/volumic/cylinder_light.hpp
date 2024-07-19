@@ -4,6 +4,14 @@
 #include "volumic_light.hpp"
 #include "utils/random.hpp"
 
+/*float phi = (_direction.x == 0.f) ? PI_2f : glm::atan(_direction.y / _direction.x) * 2.f; //[-PI/2;PI/2]
+			float theta = glm::acos(-_direction.z)*2.f; // [PI;0]
+
+			phi += (randomFloat()-0.5f) * _angle; // don't move ??
+			theta += (randomFloat()-0.5f) * _angle;
+
+			Vec3f dir = Vec3f(glm::sin(theta) * glm::cos(phi), glm::sin(theta) * glm::sin(phi), glm::cos(theta));*/
+
 namespace RT_CPU
 {
 

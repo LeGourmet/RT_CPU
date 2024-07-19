@@ -3,6 +3,7 @@
 
 #include "surfacic_light.hpp"
 #include "utils/random.hpp"
+#include "glm/gtx/transform.hpp"
 
 namespace RT_CPU
 {
@@ -14,40 +15,41 @@ namespace RT_CPU
 		~DiskLight() {}
 
 		inline virtual LightSample sample(const Vec3f& p_point, const int p_i) const override {
-			// todo stratified sampling
-			
-			//float phi = randomFloat() * TWO_PIf; // twoPI/sqrt(nbShadowRay)
 			float phi = (randomFloat()+p_i) * TWO_PIf/_nbShadowRay;
 			float r = _radius * glm::max(1e-5f, glm::sqrt(randomFloat()));
-
-			Vec3f frag = r*Vec3f(glm::cos(phi), glm::sin(phi), 0.f)+_position;
+			Vec3f frag = r*Vec3f(glm::cos(phi), glm::sin(phi), 0.f);
 			
-			// todo rotate with direction
+			Vec3f rot_axis = glm::cross(_direction, -VEC3F_Z);
+			if (glm::dot(rot_axis, rot_axis) != 0.f)
+				frag = Vec3f(glm::rotate(glm::acos(glm::dot(_direction, -VEC3F_Z)), glm::normalize(rot_axis))*Vec4f(frag, 1.f));
+			frag += _position;
 
 			Vec3f vec = frag - p_point;
 			float dist_sq = glm::dot(vec, vec);
 			Vec3f dir = glm::normalize(vec);
 
-			float pdf = dist_sq/(glm::abs(glm::dot(_direction,dir))*_area);
+			float intensity = glm::abs(glm::dot(_direction,dir))*_area;
 
-			return LightSample(_color*_power, dir, glm::sqrt(dist_sq), pdf);
+			return LightSample(_color*_power*intensity, dir, glm::sqrt(dist_sq), dist_sq);
 		}
 
 		inline LightSample sample(const Vec3f& p_point) const override {
 			float phi = randomFloat()* TWO_PIf;
 			float r = _radius * glm::max(1e-5f, glm::sqrt(randomFloat()));
+			Vec3f frag = r*Vec3f(glm::cos(phi), glm::sin(phi), 0.f);
 			
-			Vec3f frag = r*Vec3f(glm::cos(phi), glm::sin(phi), 0.f)+_position;
-			
-			// todo rotate with direction
+			Vec3f rot_axis = glm::cross(_direction, -VEC3F_Z);
+			if (glm::dot(rot_axis, rot_axis) != 0.f)
+				frag = Vec3f(glm::rotate(glm::acos(glm::dot(_direction, -VEC3F_Z)), glm::normalize(rot_axis)) * Vec4f(frag, 1.f));
+			frag += _position;
 
 			Vec3f vec = frag - p_point;
 			float dist_sq = glm::dot(vec, vec);
 			Vec3f dir = glm::normalize(vec);
 
-			float pdf = dist_sq/(glm::abs(glm::dot(_direction,dir))*_area);
+			float intensity = glm::abs(glm::dot(_direction,dir))*_area;
 
-			return LightSample(_color*_power, dir, glm::sqrt(dist_sq), pdf);
+			return LightSample(_color*_power*intensity, dir, glm::sqrt(dist_sq), dist_sq);
 		}
 
 	private:

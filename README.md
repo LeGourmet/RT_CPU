@@ -4,21 +4,37 @@
 
 Ceci est une version ameliorée d'un projet de lancer de rayons sur CPU réalisé durant ma première année du master ISICG. Le projet consistait à créer de toute pièce un moteur de rendu offline basé sur du lancer de rayons.
 
-Le moteur est ainsi capable de gérer différents types de géométrie :
+Le moteur est capable de gérer différents types de géométrie :
 - analytique : plan, sphère, triangle et triangle mesh
 - implicite 2D :
 - implicite 3D : plan, sphère, cube, cylindre, tore et certaines figures fractales
 - fractale implicite 3D : Appolonius, Julia, MandelBulb, Menger et Sierpinki
 - parametrique :
 
-Le moteur intègre aussi deux méthodes de rendu : 
-- direct lighting par sampling de primitive de lumière (directionelle, point, spot, sphérique)
-- path tracing avec importance sampling
+Le moteur dipose de différents types de lumière :
+- les basiques : directionel et ponctuel
+- les surfacique : disque et quadrilataire
+- les volumique :
+
+Le moteur intègre différents type de caméra :
+- Projetction perspective
+- Projection Orthographique
+
+Les materiaux des objets :
+- Albedo
+- Metalness
+- Roughness
+- Transmitness
+- ior
+
+La méthode de rendu utilisé par le moteur est un path tracer avec Next Event Estimation pour direct sampler les lumières de la scène.
+Il est possible de régler le nombre de rayon par pixel et le nombre de rebond maximum (1 pour direct lighting).
 
 D'autres améliorations ont aussi été réalisées comme : 
-- la création de structures accélératrices (AABB et BVH) qui ont pour vocation de grandement accélérer les calculs
-- le support de différents types de caméra (orthographique et perspective)
-- la gestion des matériaux transparents 
+- La création de structures accélératrices (AABB et BVH) qui ont pour vocation de grandement accélérer les calculs
+- Stratified Sampling des lumières
+- Stratified Sampling des rayons primaires
+- Importance sampling de la BSDF
 
 ## Résultats
 
@@ -53,10 +69,9 @@ Plusieurs ajouts sont en vue pour la géométrie dans ce moteur :
 Des modifications au niveau des objets peuplant la scène sont à prévoir :
 - l'ajout des nouveaux type de caméra : panoramique, fisheye
 - l'ajout d'un profile de lumière pour la ponctual light (Goniophotometric Diagram Map / IES profile)
-- refactor la quad light (use u,v,w coordinate)
-- l'ajout d'un nouveau type de surfacique light : disk
 - refactor la sphere light (use inner and outer angle)
 - l'ajout d'un nouveau type de volumic light : cylinder
+- le refactor des light intensity pour correspondre à des watts ou des lumen
 
 
 - l'ajout de support pour les environement map

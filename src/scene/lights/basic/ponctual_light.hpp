@@ -7,6 +7,9 @@ namespace RT_CPU
 {
 
 	// blender export or gltf need multiply by 4.f*PI/683.f => (lm/steradian)
+	// innerAngle and outerAngle => angle[0;2PI] + falloff[0,1] (0 no extinction; 1 no extinction)
+	// add radius and sample like spherical light
+	// add profil
 
 	class PonctualLight : public BasicLight
 	{
