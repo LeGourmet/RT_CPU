@@ -7,7 +7,7 @@ Ceci est une version ameliorée d'un projet de lancer de rayons sur CPU réalis�
 Le moteur est capable de gérer différents types de géométrie :
 - analytique : plan, sphère, triangle et triangle mesh
 - implicite 2D :
-- implicite 3D : plan, sphère, cube, cylindre, tore et certaines figures fractales
+- implicite 3D : plan, sphère, cube, cylindre, tore
 - fractale implicite 3D : Appolonius, Julia, MandelBulb, Menger et Sierpinki
 - parametrique :
 
@@ -71,7 +71,7 @@ Des modifications au niveau des objets peuplant la scène sont à prévoir :
 - l'ajout d'un profile de lumière pour la ponctual light (Goniophotometric Diagram Map / IES profile)
 - refactor la sphere light (use inner and outer angle)
 - l'ajout d'un nouveau type de volumic light : cylinder
-- le refactor des light intensity pour correspondre à des watts ou des lumen
+- le refactor des light intensity pour correspondre à des watts ou des lumens
 
 
 - l'ajout de support pour les environement map
@@ -85,5 +85,5 @@ Des modifications au niveau des objets peuplant la scène sont à prévoir :
 - la gestion de graph de scène et d'instancing
 - l'amélioration de la méthode de rendu par l'utilisation de NEE et de bidirectional path tracing
 - la gestion des textures (albedo, normal, metalness/roughness/transmitness)
-- l'amélioration de la BSDF (ajout clearcoat, sheen, anisotropie, ggx mutiscatering/energie compensation, translucence, iridescence, absorbance, scattering, alpha)
+- l'amélioration de la BSDF (ajout clearcoat, sheen, anisotropie, ggx mutiscatering/energie compensation, translucence, iridescence, absorbance, sub surface scattering, alpha)
 - l'ajout d'effets de post-processing (AgX, denoiser)

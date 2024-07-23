@@ -27,9 +27,7 @@ namespace RT_CPU
 			float dist_sq = glm::dot(vec,vec);
 			Vec3f dir = glm::normalize(vec);
 
-			float intensity = glm::abs(glm::dot(_direction,dir))*_area;
-
-			return LightSample(_color*_power*intensity, dir, glm::sqrt(dist_sq), dist_sq);
+			return LightSample(_color*_power, dir, glm::sqrt(dist_sq), dist_sq/glm::max(1e-5f,glm::abs(glm::dot(_direction,dir))*_area));
 		}
 
 		inline LightSample sample(const Vec3f& p_point) const override {
@@ -43,10 +41,8 @@ namespace RT_CPU
 			Vec3f vec = frag-p_point;
 			float dist_sq = glm::dot(vec,vec);
 			Vec3f dir = glm::normalize(vec);
-
-			float intensity = glm::abs(glm::dot(_direction,dir))*_area;
-
-			return LightSample(_color*_power*intensity, dir, glm::sqrt(dist_sq), dist_sq);
+			
+			return LightSample(_color*_power, dir, glm::sqrt(dist_sq), dist_sq/glm::max(1e-5f,glm::abs(glm::dot(_direction,dir))*_area));
 		}
 
 	  private:

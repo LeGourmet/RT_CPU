@@ -94,18 +94,34 @@ namespace RT_CPU
 						for (int i = 0; i < light->getNbShadowRay();i++) {
 							LightSample lightSample = light->sample(hitRecord._point, i);
 							Ray shadowRay = Ray(hitRecord._point, lightSample._direction);
-							shadowRay.offset(hitRecord._normal);
+							shadowRay.offset((glm::dot(hitRecord._normal,lightSample._direction)<0.f) ? -hitRecord._normal : hitRecord._normal);
 
-							if (inside) break;
-							if (glm::dot(hitRecord._normal, shadowRay.getDirection()) > 0.f && glm::dot(hitRecord._normal, -currentRay.getDirection()) > 0.f && !p_scene.intersectAny(shadowRay, p_near, lightSample._distance-p_near))
-								lightRadiosity += lightSample._radiance * hitRecord._mesh->getMaterial()->evaluateBRDF(-currentRay.getDirection(), hitRecord._normal, lightSample._direction, ni, no) / glm::max(1e-5f, lightSample._pdf);
+							//if (inside) break;
+							//if (glm::dot(hitRecord._normal, shadowRay.getDirection()) > 0.f && glm::dot(hitRecord._normal, -currentRay.getDirection()) > 0.f && !p_scene.intersectAny(shadowRay, p_near, lightSample._distance-p_near))
+							if (!p_scene.intersectAny(shadowRay, p_near, lightSample._distance-p_near)){
+								/* --------------- MIS ---------------
+								// https://pbr-book.org/3ed-2018/Monte_Carlo_Integration/Importance_Sampling
+								float powerHeuristic(int nf, float fPdf, int ng, float gPdf){
+									float f = float(nf) * fPdf, g = float(ng) * gPdf;
+									return (f * f) / (f * f + g * g);
+								}
+
+								// float lightpdf = dist_sq/max(1e-5, abs(cosT) * area); // sure ?
+
+								weight = powerHeuristic(1.f,lightSample._pdf, 1.f, bsdf.pdf)
+								lighRadiosity += .... * weight / lightsample._pdf;*/
+								float bsdfPdf = 1.f;
+								Vec3f bsdfValue = hitRecord._mesh->getMaterial()->evaluateBSDF(-currentRay.getDirection(), hitRecord._normal, lightSample._direction, ni, no, bsdfPdf);
+								float weight = lightSample._pdf*lightSample._pdf/(lightSample._pdf*lightSample._pdf+bsdfPdf*bsdfPdf);
+								lightRadiosity += lightSample._radiance * weight * bsdfValue / glm::max(1e-5f, lightSample._pdf);
+							}
 						}
 						finalColor += rayColor * lightRadiosity / (float)light->getNbShadowRay();
 					}
 
 					if(inside) rayColor *= hitRecord._mesh->getMaterial()->getAbsoptivity(hitRecord._distance);
 					finalColor += hitRecord._mesh->getMaterial()->getEmissivity()*rayColor;
-					currentRay = hitRecord._mesh->getMaterial()->evaluateWeightedBSDF(currentRay,hitRecord,ni,no,rayColor);
+					currentRay = hitRecord._mesh->getMaterial()->sampleBSDF(currentRay,hitRecord,ni,no,rayColor);
 					
 					if (rayColor.x == 0.f && rayColor.y == 0.f && rayColor.z == 0.f) break;
 

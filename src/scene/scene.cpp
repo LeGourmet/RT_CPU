@@ -49,19 +49,27 @@ namespace RT_CPU
 		// camera test
 
 		if(p_id==0){ // material test
-			_camera = new CameraPerspective(Vec3f(0.f, -15.f, 15.f), Vec3f(0.f, 0.f, 2.f), PIf / 3.f, 1.f, aspectRatio);
+			_camera = new CameraPerspective(Vec3f(0.f, -8.f, 16.f), Vec3f(0.f, -1.f, 2.f), PIf / 3.f, 1.f, aspectRatio);
 			_lights.push_back(new QuadLight(Vec3f(0.f, 0.f, 50.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 100.f, Vec3f(10.f,0.f,0.f), Vec3f(0.f,10.f,0.f)));
+			//_lights.push_back(new PonctualLight(Vec3f(0.f, 0.f, 50.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 10000.f, -PIf, -PIf));
 			
 			_meshes.push_back(new Plane(Vec3f(0.f, 0.f, 0.f), Vec3f(0., 0., 1.f)));
-			_materials.push_back(new Material(Vec3f(0.5f, 0.5f, 0.5f), VEC3F_ZERO, 0.f, 0.f, 1.f, 0.f, VEC3F_ZERO, 0.f, 1.f));
+			_materials.push_back(new Material(Vec4f(0.5f, 0.5f, 0.5f, 1.f), 0.f, VEC3F_ZERO, 0.f, 0.f, 1.f, 0.f, VEC3F_ZERO, 0.f, 1.f));
+
+			//_meshes.push_back(new Sphere(Vec3f(0.f, 0.f, 100.f), 10.f));
+			//_materials.push_back(new Material(VEC4F_ONE, 0.f, VEC3F_ONE, 100.f, 0.f, 1.f, 0.f, VEC3F_ZERO, 0.f, 1.f));
 
 			for(int i=0; i<9 ;i++) {
+				// Sheen
+				//_materials.push_back(new Material(Vec3f(randomFloat(), randomFloat(), randomFloat()), VEC3F_ZERO, 0.f, 0.f, i*0.125f, 0.f, VEC3F_ZERO, 0.f, 1.5f));
+				//_meshes.push_back(new Sphere(Vec3f(-10.f + i * 2.5f, -10.f, 2.f), 1.f));
+				
 				// Dielectric
-				_materials.push_back(new Material(Vec3f(randomFloat(), randomFloat(), randomFloat()), VEC3F_ZERO, 0.f, 0.f, i*0.125f, 0.f, VEC3F_ZERO, 0.f, 1.5f));
+				_materials.push_back(new Material(Vec4f(randomFloat(), randomFloat(), randomFloat(), 1.f), 0.f, VEC3F_ZERO, 0.f, 0.f, i*0.125f, 0.f, VEC3F_ZERO, 0.f, 1.5f));
 				_meshes.push_back(new Sphere(Vec3f(-10.f + i * 2.5f, -7.5f, 2.f), 1.f));
 				
 				// Metalic
-				_materials.push_back(new Material(Vec3f(randomFloat(), randomFloat(), randomFloat()), VEC3F_ZERO, 0.f, 1.f, i*0.125f, 0.f, VEC3F_ZERO, 0.f, 1.5f));
+				_materials.push_back(new Material(Vec4f(randomFloat(), randomFloat(), randomFloat(), 1.f), 0.f, VEC3F_ZERO, 0.f, 1.f, i*0.125f, 0.f, VEC3F_ZERO, 0.f, 1.5f));
 				_meshes.push_back(new Sphere(Vec3f(-10.f + i * 2.5f, -5.f, 2.f), 1.f));
 
 				// Metalic Anisotropie
@@ -71,27 +79,27 @@ namespace RT_CPU
 				// Clear Coat
 				//_materials.push_back(new Material(Vec3f(randomFloat(), randomFloat(), randomFloat()), VEC3F_ZERO, 0.f, 1.f, 0.6f, 0.f, VEC3F_ZERO, 0.f, 1.5f));
 				//_meshes.push_back(new Sphere(Vec3f(-10.f + i * 2.5f, 0.f, 2.f), 1.f));
-
-				// Transparent
-				_materials.push_back(new Material(Vec3f(randomFloat(), randomFloat(), randomFloat()), VEC3F_ZERO, 0.f, 0.f, i*0.125f, 1.f, VEC3F_ZERO, 0.f, 1.5f));
+				
+				// Alpha
+				_materials.push_back(new Material(Vec4f(randomFloat(), randomFloat(), randomFloat(), i*0.125f), 1.f, VEC3F_ZERO, 0.f, 0.5f, 0.2f, 0.f, VEC3F_ZERO, 0.f, 1.5f));
 				_meshes.push_back(new Sphere(Vec3f(-10.f + i * 2.5f, 2.5f, 2.f), 1.f));
 
-				// Absorbance
-				_materials.push_back(new Material(VEC3F_ONE, VEC3F_ZERO, 0.f, 0.f, 0.f, 1.f, Vec3f(0.9f,0.3f,0.3f), i*1.f, 1.5f));
+				// Transparent
+				_materials.push_back(new Material(Vec4f(randomFloat(), randomFloat(), randomFloat(), 1.f), 0.f, VEC3F_ZERO, 0.f, 0.f, i*0.125f, 1.f, VEC3F_ZERO, 0.f, 1.5f));
 				_meshes.push_back(new Sphere(Vec3f(-10.f + i * 2.5f, 5.f, 2.f), 1.f));
 
-				// Sheen
-				//_materials.push_back(new Material(Vec3f(randomFloat(), randomFloat(), randomFloat()), VEC3F_ZERO, 0.f, 0.f, i*0.125f, 0.f, VEC3F_ZERO, 0.f, 1.5f));
-				//_meshes.push_back(new Sphere(Vec3f(-10.f + i * 2.5f, 7.5f, 2.f), 1.f));
+				// Absorbance
+				_materials.push_back(new Material(Vec4f(1.f,1.f,1.f,1.f), 0.f, VEC3F_ZERO, 0.f, 0.f, 0.f, 1.f, Vec3f(0.9f, 0.3f, 0.3f), i * 1.f, 1.5f));
+				_meshes.push_back(new Sphere(Vec3f(-10.f + i * 2.5f, 7.5f, 2.f), 1.f));
 
 				// Emissive
-				_materials.push_back(new Material(VEC3F_ONE, Vec3f(randomFloat(), randomFloat(), randomFloat()), i*2.5f, 0.f, 1.f, 0.f, VEC3F_ZERO, 0.f, 1.5f));
+				_materials.push_back(new Material(Vec4f(1.f, 1.f, 1.f, 1.f), 0.f, Vec3f(randomFloat(), randomFloat(), randomFloat()), i*2.5f, 0.f, 1.f, 0.f, VEC3F_ZERO, 0.f, 1.5f));
 				_meshes.push_back(new Sphere(Vec3f(-10.f + i * 2.5f, 10.f, 2.f), 1.f));
 			}
 
 			for(int i=0; i<_meshes.size() ;i++) _meshes[i]->setMaterial(_materials[i]);
 
-		}else if(p_id==1){ // fractal test
+		}/*else if (p_id == 1) { // fractal test
 			_camera = new CameraPerspective(Vec3f(0.f, -4.f, 3.f), Vec3f(0.f, 0.f, 1.f), PIf / 3.f, 1.f, aspectRatio);
 
 			_materials.push_back(new Material(Vec3f(1.f, 1.f, 1.f)    , VEC3F_ONE , 5.f, 0.f, 1.f, 0.f, VEC3F_ZERO, 0.f, 1.f));
@@ -132,8 +140,8 @@ namespace RT_CPU
 
 		} else if(p_id == 3) { // triangle mesh test
 			_camera = new CameraPerspective(Vec3f(-3.47f, -1.35f, 1.7f), Vec3f(0.f, 0.f, 0.f), PIf / 3.f, 1.f, aspectRatio);
-			//_lights.push_back(new QuadLight(Vec3f(0.f, 0.f, 2.8f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 2.5f, Vec3f(4.f, 0.f, 0.f), Vec3f(0.f, 4.f, 0.f)));
-			_lights.push_back(new PonctualLight(Vec3f(0.f, 0.f, 2.8f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 30.f, -PIf, -PIf));
+			_lights.push_back(new QuadLight(Vec3f(0.f, 0.f, 2.8f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 2.5f, Vec3f(4.f, 0.f, 0.f), Vec3f(0.f, 4.f, 0.f)));
+			//_lights.push_back(new PonctualLight(Vec3f(0.f, 0.f, 2.8f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 30.f, -PIf, -PIf));
 			_materials.push_back(new Material(Vec3f(0.5f, 0.5f, 0.5f), VEC3F_ZERO, 0.f, 0.f, 1.f, 0.f, VEC3F_ZERO, 0.f, 1.f));
 			_loadGltf("assets/conference_dragon_and_bunny.glb");
 		} else if (p_id == 4) {
@@ -170,7 +178,7 @@ namespace RT_CPU
 
 			for(int i=0; i<_meshes.size() ;i++) _meshes[i]->setMaterial(_materials[i]);
 						
-		}
+		}*/
 
 		_bvh.build(&_meshes);
 	}
@@ -209,7 +217,8 @@ namespace RT_CPU
 		_materials.reserve(startIdMaterials + model.materials.size());
 		for (tinygltf::Material m : model.materials)
 			_materials.push_back(new Material(
-				Vec3f(glm::make_vec4(m.pbrMetallicRoughness.baseColorFactor.data())),
+				glm::make_vec4(m.pbrMetallicRoughness.baseColorFactor.data()),
+				(m.alphaMode == "OPAQUE" ? 0.f : (m.alphaMode == "BLEND" ? 1.f : (float)m.alphaCutoff)),
 				glm::make_vec3(m.emissiveFactor.data()),
 				m.extensions.find("KHR_materials_emissive_strength") != m.extensions.end() && m.extensions.at("KHR_materials_emissive_strength").Has("emissiveStrength") ? (float)m.extensions.at("KHR_materials_emissive_strength").Get("emissiveStrength").GetNumberAsDouble() : 1.f,
 				(float)m.pbrMetallicRoughness.metallicFactor,

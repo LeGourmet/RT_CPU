@@ -21,8 +21,8 @@ int main(int argc, char** argv)
 
 		Image img = Image(imgWidth, imgHeight);
 
-		Scene scene = Scene(img, 4);
-		Renderer renderer = Renderer(4,3);
+		Scene scene = Scene(img, 0);
+		Renderer renderer = Renderer(16,12);
 
 		// Launch rendering.
 		std::cout << "Rendering..." << std::endl;
