@@ -11,7 +11,7 @@ namespace RT_CPU
 	  public:
 		// len(cross(a,b)) = len(a) * len(b) * sin(a^b)   ==>   area = L * H * sin(u^v)
 		QuadLight( const Vec3f& p_position, const Vec3f& p_direction, const Vec3f& p_color, float p_power, const Vec2f& p_u, const Vec2f& p_v, int p_nbShadowRay = 4)
-			: SurfacicLight( p_position, p_direction, p_color, p_power, glm::length(glm::cross(Vec3f(p_u,0.f), Vec3f(p_v,0.f))), p_nbShadowRay ), _u( p_u ), _v( p_v ), _nbRow(p_nbShadowRay) {}
+			: SurfacicLight( p_position, p_direction, p_color, p_power, 16.f/*glm::length(glm::cross(Vec3f(p_u, 0.f), Vec3f(p_v, 0.f)))*/, p_nbShadowRay), _u(p_u), _v(p_v), _nbRow(p_nbShadowRay) {}
 		~QuadLight() {}
 
 		inline virtual LightSample sample(const Vec3f& p_point, const int p_i) const override {
