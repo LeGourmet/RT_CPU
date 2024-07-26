@@ -1,6 +1,7 @@
 #include "scene.hpp"
 
-#include "tinygltf/tiny_gltf.h"
+#include "fastgltf/core.hpp"
+#include "fastgltf/types.hpp"
 #include <glm/gtc/type_ptr.hpp>
 
 #include "utils/defines.hpp"
@@ -202,83 +203,112 @@ namespace RT_CPU
 	void Scene::_loadGltf(const std::filesystem::path& p_path) {
 		std::cout << "Start loading " << p_path << std::endl;
 
-        tinygltf::TinyGLTF loader;
-        tinygltf::Model model;
+		fastgltf::Parser _parser = fastgltf::Parser(
+			fastgltf::Extensions::KHR_lights_punctual |
+			fastgltf::Extensions::KHR_materials_ior |
+			//fastgltf::Extensions::KHR_materials_iridescence |
+			fastgltf::Extensions::KHR_materials_volume |
+			fastgltf::Extensions::KHR_materials_transmission |
+			//fastgltf::Extensions::KHR_materials_clearcoat |
+			fastgltf::Extensions::KHR_materials_emissive_strength
+			//fastgltf::Extensions::KHR_materials_sheen |
+			//fastgltf::Extensions::KHR_materials_anisotropy
+			//fastgltf::Extensions::KHR_materials_dispersion
+			); 
+		// + EXT_lights_ies
+		// + EXT_lights_image_based
+		// + KHR_materials_subsuface
 
-        loader.SetPreserveImageChannels(true);
+		// preserved chanel ?
 
-        if (p_path.extension() == ".gltf") {
-            if (!loader.LoadASCIIFromFile(&model, nullptr, nullptr, p_path.string())) throw std::runtime_error("Fail to load file: " + p_path.string());
-        } else {
-            if (!loader.LoadBinaryFromFile(&model, nullptr, nullptr, p_path.string())) throw std::runtime_error("Fail to load file: " + p_path.string());
-        }
+		auto data = fastgltf::GltfDataBuffer::FromPath(p_path);
+		if (data.error() != fastgltf::Error::None) throw std::runtime_error("Fail to load file: file incorect.");
+
+		fastgltf::Expected<fastgltf::Asset> asset = _parser.loadGltfBinary(data.get(), p_path.parent_path(), fastgltf::Options::DecomposeNodeMatrices | fastgltf::Options::DontRequireValidAssetMember);
+		if (asset.error() != fastgltf::Error::None) throw std::runtime_error("Fail to load file: gltf incorect.");
 
 		// ------------- MATERIALS
 		unsigned int startIdMaterials = (unsigned int)_materials.size();
-		_materials.reserve(startIdMaterials + model.materials.size());
-		for (tinygltf::Material m : model.materials)
+		_materials.reserve(startIdMaterials + asset->materials.size());
+		for (fastgltf::Material& m : asset->materials)
 			_materials.push_back(new Material(
-				glm::make_vec4(m.pbrMetallicRoughness.baseColorFactor.data()),
-				(m.alphaMode == "OPAQUE" ? 0.f : (m.alphaMode == "BLEND" ? 1.f : (float)m.alphaCutoff)),
+				glm::make_vec4(m.pbrData.baseColorFactor.data()),
+				(m.alphaMode == fastgltf::AlphaMode::Opaque ? 0.f : (m.alphaMode == fastgltf::AlphaMode::Blend ? 1.f : (float)m.alphaCutoff)),
 				glm::make_vec3(m.emissiveFactor.data()),
-				m.extensions.find("KHR_materials_emissive_strength") != m.extensions.end() && m.extensions.at("KHR_materials_emissive_strength").Has("emissiveStrength") ? (float)m.extensions.at("KHR_materials_emissive_strength").Get("emissiveStrength").GetNumberAsDouble() : 1.f,
-				(float)m.pbrMetallicRoughness.metallicFactor,
-				(float)m.pbrMetallicRoughness.roughnessFactor,
-				m.extensions.find("KHR_materials_transmission") != m.extensions.end() && m.extensions.at("KHR_materials_transmission").Has("transmissionFactor") ? (float)m.extensions.at("KHR_materials_transmission").Get("transmissionFactor").GetNumberAsDouble() : 0.f,
-				VEC3F_ZERO, 0.f, // should transform to fastgltf
-				m.extensions.find("KHR_materials_ior") != m.extensions.end() && m.extensions.at("KHR_materials_ior").Has("ior") ? (float)m.extensions.at("KHR_materials_ior").Get("ior").GetNumberAsDouble() : 1.f
+				(float)m.emissiveStrength, 
+				(float)m.pbrData.metallicFactor,
+				(float)m.pbrData.roughnessFactor,
+				((m.transmission.get() == nullptr) ? 0.f : (float)m.transmission.get()->transmissionFactor),
+				((m.volume.get() == nullptr) ? VEC3F_ONE : glm::make_vec3(m.volume.get()->attenuationColor.data())),
+				((m.volume.get() == nullptr) ? FLT_MAX : (float)m.volume.get()->attenuationDistance),
+				(float)m.ior
 			));
 
 		std::cout << "materials loaded: " << _materials.size() - startIdMaterials << std::endl;
 
 		// ------------- MESHES
-		unsigned int startIdObjects = (unsigned int)_meshes.size();
-		_meshes.reserve(startIdObjects + model.meshes.size());
-		for (tinygltf::Mesh m : model.meshes) {
-			for (tinygltf::Primitive p : m.primitives) {
-				if (p.indices == -1) throw std::runtime_error("Fail to load file: primitive indices must be define.");
+		unsigned int startIdMeshes = (unsigned int)_meshes.size();
+		_meshes.reserve(startIdMeshes + asset->meshes.size());
+		for (fastgltf::Mesh& m : asset->meshes) {
+			for (fastgltf::Primitive& p : m.primitives) {
+				if (!p.indicesAccessor.has_value()) throw std::runtime_error("Fail to load file: primitive indices must be define.");
+				if (p.type != fastgltf::PrimitiveType::Triangles) throw std::runtime_error("Fail to load file: primitive must be define by triangles.");
 
-				tinygltf::Accessor a_position = model.accessors[p.attributes.at("POSITION")];
-				tinygltf::Accessor a_normal = model.accessors[p.attributes.at("NORMAL")];
+				fastgltf::Attribute* itPosition = p.findAttribute("POSITION");
+				if (itPosition == p.attributes.end()) throw std::runtime_error("Fail to load file: primitive must contain position buffer.");
+				fastgltf::Accessor& a_position = asset->accessors[itPosition->accessorIndex];
 
-				if ((a_position.count != a_normal.count)) throw std::runtime_error("Fail to load file: primitive vertices must have the same number of position, normal and texcoord0.");
+				fastgltf::Attribute* itNormal = p.findAttribute("NORMAL");
+				if (itNormal == p.attributes.end()) throw std::runtime_error("Fail to load file: primitive must contain normal buffer.");
+				fastgltf::Accessor& a_normal = asset->accessors[itNormal->accessorIndex];
 
-				tinygltf::Accessor a_indices = model.accessors[p.indices];
-				tinygltf::BufferView bv_indices = model.bufferViews[a_indices.bufferView];
+				if (a_position.count != a_normal.count) throw std::runtime_error("Fail to load file: primitive vertices must have the same number of position and normal.");
+				
+				fastgltf::Accessor& a_indices = asset->accessors[p.indicesAccessor.value()];
+				if (!a_indices.bufferViewIndex.has_value()) throw std::runtime_error("Fail to load file: primitive indices must be define.");
+				fastgltf::BufferView& bv_indices = asset->bufferViews[a_indices.bufferViewIndex.value()];
 
-				std::vector<Vec2u> indices;
-				indices.reserve((unsigned int)a_indices.count);
-				if (a_indices.componentType == TINYGLTF_PARAMETER_TYPE_UNSIGNED_INT) {
-					const unsigned int* data = reinterpret_cast<const unsigned int*>(&model.buffers[bv_indices.buffer].data[a_indices.byteOffset + bv_indices.byteOffset]);
-					for(unsigned int i=0; i<(unsigned int)a_indices.count ;i++) indices.push_back(Vec2u(data[i],data[i]));
-				} else if(a_indices.componentType == TINYGLTF_PARAMETER_TYPE_UNSIGNED_SHORT){
-					const unsigned short* data = reinterpret_cast<const unsigned short*>(&model.buffers[bv_indices.buffer].data[a_indices.byteOffset + bv_indices.byteOffset]);
-					for(unsigned int i=0; i<(unsigned int)a_indices.count ;i++) indices.push_back(Vec2u(data[i],data[i]));
-				} else if(a_indices.componentType == TINYGLTF_PARAMETER_TYPE_UNSIGNED_BYTE){
-					const unsigned char* data = reinterpret_cast<const unsigned char*>(&model.buffers[bv_indices.buffer].data[a_indices.byteOffset + bv_indices.byteOffset]);
-					for(unsigned int i=0; i<(unsigned int)a_indices.count ;i++) indices.push_back(Vec2u(data[i],data[i]));
+				std::vector<unsigned int> indices;
+				if (!std::holds_alternative<fastgltf::sources::Array>(asset->buffers[bv_indices.bufferIndex].data)) throw std::runtime_error("Primitive indices type should be vector!");
+				if (a_indices.componentType == fastgltf::ComponentType::UnsignedInt) {
+					const unsigned int* data = reinterpret_cast<const unsigned int*>(std::get<3>(asset->buffers[bv_indices.bufferIndex].data).bytes.data() + a_indices.byteOffset + bv_indices.byteOffset);
+					indices = std::vector<unsigned int>(data, &data[a_indices.count]);
+				}
+				else if (a_indices.componentType == fastgltf::ComponentType::UnsignedShort) {
+					indices.reserve((unsigned int)a_indices.count);
+					const unsigned short* data = reinterpret_cast<const unsigned short*>(std::get<3>(asset->buffers[bv_indices.bufferIndex].data).bytes.data() + a_indices.byteOffset + bv_indices.byteOffset);
+					for (unsigned int i = 0; i < (unsigned int)a_indices.count; i++) indices.push_back(data[i]);
+				}
+				else if (a_indices.componentType == fastgltf::ComponentType::UnsignedByte) {
+					indices.reserve((unsigned int)a_indices.count);
+					const unsigned char* data = reinterpret_cast<const unsigned char*>(std::get<3>(asset->buffers[bv_indices.bufferIndex].data).bytes.data() + a_indices.byteOffset + bv_indices.byteOffset);
+					for (unsigned int i = 0; i < (unsigned int)a_indices.count; i++) indices.push_back(data[i]);
 				}
 
-				std::vector<Vec3f> positions;
-				positions.reserve(a_position.count);
-				tinygltf::BufferView bv_position = model.bufferViews[a_position.bufferView];
-				const float* positionsBuffer = reinterpret_cast<const float*>(&model.buffers[bv_position.buffer].data[a_position.byteOffset + bv_position.byteOffset]);
+				if (!a_position.bufferViewIndex.has_value()) throw std::runtime_error("Fail to load file: primitive positions must be define.");
+				fastgltf::BufferView& bv_position = asset->bufferViews[a_position.bufferViewIndex.value()];
+				if (!std::holds_alternative<fastgltf::sources::Array>(asset->buffers[bv_position.bufferIndex].data)) throw std::runtime_error("Fail to load file: primitive positions type should be vector!");
+				const float* positionsBuffer = reinterpret_cast<const float*>(std::get<3>(asset->buffers[bv_position.bufferIndex].data).bytes.data() + a_position.byteOffset + bv_position.byteOffset);
 
-				std::vector<Vec3f> normals;
-				positions.reserve(a_normal.count);
-				tinygltf::BufferView bv_normal = model.bufferViews[a_normal.bufferView];
-				const float* normalsBuffer = reinterpret_cast<const float*>(&model.buffers[bv_normal.buffer].data[a_normal.byteOffset + bv_normal.byteOffset]);
+				if (!a_normal.bufferViewIndex.has_value()) throw std::runtime_error("Fail to load file: primitive normals must be define.");
+				fastgltf::BufferView& bv_normal = asset->bufferViews[a_normal.bufferViewIndex.value()];
+				if (!std::holds_alternative<fastgltf::sources::Array>(asset->buffers[bv_normal.bufferIndex].data)) throw std::runtime_error("Fail to load file: primitive normals type should be vector!");
+				const float* normalsBuffer = reinterpret_cast<const float*>(std::get<3>(asset->buffers[bv_normal.bufferIndex].data).bytes.data() + a_normal.byteOffset + bv_normal.byteOffset);
 
+				std::vector<Vec3f> positions; positions.reserve(a_position.count);
+				std::vector<Vec3f> normals; positions.reserve(a_normal.count);
 				for (unsigned int i = 0; i < a_position.count;i++) {
-					positions.push_back(glm::make_vec3(&positionsBuffer[i * 3]));
-					normals.push_back(glm::normalize(glm::make_vec3(&normalsBuffer[i * 3])));
+					Vec3f pos = glm::make_vec3(&positionsBuffer[i * 3]);
+					Vec3f norm = glm::normalize(glm::make_vec3(&normalsBuffer[i * 3]));
+					positions.push_back(Vec3f(pos.x, -pos.z, pos.y));
+					normals.push_back(Vec3f(norm.x, -norm.z, norm.y));
 				}
 
 				_meshes.push_back(new TriangleMesh(positions,normals,indices));
-				_meshes[_meshes.size()-1]->setMaterial(_materials[(p.material == -1) ? 0 : startIdMaterials + p.material]);
+				_meshes[_meshes.size()-1]->setMaterial(_materials[((p.materialIndex.has_value()) ? startIdMaterials + p.materialIndex.value() : 0)]);
 			}
 		}
-		std::cout << "meshes loaded: " << _meshes.size() - startIdObjects << std::endl;
+		std::cout << "meshes loaded: " << _meshes.size() - startIdMeshes << std::endl;
 
 		std::cout << "Finished to load " << p_path << std::endl;
 	}

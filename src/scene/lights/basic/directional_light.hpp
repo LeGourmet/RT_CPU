@@ -7,6 +7,7 @@
 namespace RT_CPU
 {
 	// blender export or gltf need multiply by 1.f/683.f
+	// NEE => eclipse wtf ??
 
 	class DirectionalLight : public BasicLight
 	{

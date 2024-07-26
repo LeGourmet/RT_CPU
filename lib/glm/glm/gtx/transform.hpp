@@ -19,13 +19,7 @@
 #include "../glm.hpp"
 #include "../gtc/matrix_transform.hpp"
 
-#if GLM_MESSAGES == GLM_ENABLE && !defined(GLM_EXT_INCLUDED)
-#	ifndef GLM_ENABLE_EXPERIMENTAL
-#		pragma message("GLM: GLM_GTX_transform is an experimental extension and may change in the future. Use #define GLM_ENABLE_EXPERIMENTAL before including it, if you really want to use it.")
-#	else
-#		pragma message("GLM: GLM_GTX_transform extension included")
-#	endif
-#endif
+# pragma message("GLM: GLM_GTX_transform extension included")
 
 namespace glm
 {

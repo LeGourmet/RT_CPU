@@ -12,14 +12,14 @@ namespace RT_CPU
 	class TriangleMesh : public Mesh
 	{
 	public:
-		TriangleMesh(std::vector<Vec3f>& p_vertices, std::vector<Vec3f> &p_normals, std::vector<Vec2u>& p_indices) : Mesh() {
+		TriangleMesh(std::vector<Vec3f>& p_vertices, std::vector<Vec3f> &p_normals, std::vector<unsigned int>& p_indices) : Mesh() {
 			_vertices = p_vertices;
 			_normals = p_normals;
 			
 			for(unsigned int i=0; i<p_indices.size() ;i+=3)
 				_triangles.push_back(new Triangle(
-					_vertices[p_indices[i].x], _vertices[p_indices[i+1].x], _vertices[p_indices[i+2].x],
-					_normals [p_indices[i].y], _normals [p_indices[i+1].y], _normals [p_indices[i+2].y]
+					_vertices[p_indices[i]], _vertices[p_indices[i+1]], _vertices[p_indices[i+2]],
+					_normals [p_indices[i]], _normals [p_indices[i+1]], _normals [p_indices[i+2]]
 				));
 
 			_bvh.build(&_triangles);

@@ -104,8 +104,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)\src;$(ProjectDir)\lib;$(ProjectDir)\lib\glm;$(ProjectDir)\lib\stb;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir)\src;$(ProjectDir)\lib;$(ProjectDir)\lib\glm;$(ProjectDir)\lib\stb;$(ProjectDir)\lib\fastgltf;$(ProjectDir)\lib\simdjson;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
@@ -125,8 +125,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)\src;$(ProjectDir)\lib;$(ProjectDir)\lib\glm;$(ProjectDir)\lib\stb;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir)\src;$(ProjectDir)\lib;$(ProjectDir)\lib\glm;$(ProjectDir)\lib\stb;$(ProjectDir)\lib\fastgltf;$(ProjectDir)\lib\simdjson;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
@@ -143,14 +143,25 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="lib\tinygltf\tiny_gltf.cc" />
+    <ClCompile Include="lib\fastgltf\base64.cpp" />
+    <ClCompile Include="lib\fastgltf\fastgltf.cpp" />
+    <ClCompile Include="lib\fastgltf\fastgltf.ixx" />
+    <ClCompile Include="lib\fastgltf\io.cpp" />
+    <ClCompile Include="lib\simdjson\simdjson.cpp" />
     <ClCompile Include="src\accelerators\bvh.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\scene\scene.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="lib\tinygltf\json.hpp" />
-    <ClInclude Include="lib\tinygltf\tiny_gltf.h" />
+    <ClInclude Include="lib\fastgltf\base64.hpp" />
+    <ClInclude Include="lib\fastgltf\core.hpp" />
+    <ClInclude Include="lib\fastgltf\dxmath_element_traits.hpp" />
+    <ClInclude Include="lib\fastgltf\glm_element_traits.hpp" />
+    <ClInclude Include="lib\fastgltf\math.hpp" />
+    <ClInclude Include="lib\fastgltf\tools.hpp" />
+    <ClInclude Include="lib\fastgltf\types.hpp" />
+    <ClInclude Include="lib\fastgltf\util.hpp" />
+    <ClInclude Include="lib\simdjson\simdjson.h" />
     <ClInclude Include="src\accelerators\bvh.hpp" />
     <ClInclude Include="src\ray\hit_record.hpp" />
     <ClInclude Include="src\ray\ray.hpp" />
