@@ -19,23 +19,22 @@ namespace RT_CPU
     {
     public:
         // --------------------------------------------- DESTRUCTOR / CONSTRUCTOR ----------------------------------------------
-        Material(const Vec4f& p_albedo, float p_alphaCutoff, const Vec3f& p_emissiveColor, float p_emissiveStrength, float p_metalness, float p_roughness, float p_transmitness, const Vec3f& p_absorptionColor, float p_absorptionDensity, float p_ior) :
-            _albedo(p_albedo), _alphaCutoff(p_alphaCutoff), _emissiveColor(p_emissiveColor), _emissiveStrength(p_emissiveStrength), _metalness(p_metalness), _roughness(p_roughness), _transmitness(p_transmitness), _absorptionColor(p_absorptionColor), _absorptionDensity(p_absorptionDensity), _ior(p_ior) { }
+        Material(const Vec4f& p_albedo, float p_alphaCutoff, const Vec3f& p_emissiveColor, float p_emissiveStrength, float p_metalness, float p_roughness, float p_transmitness, float p_anisotropy, const Vec3f& p_absorptionColor, float p_absorptionDensity, float p_ior) :
+            _albedo(p_albedo), _alphaCutoff(p_alphaCutoff), _emissiveColor(p_emissiveColor), _emissiveStrength(p_emissiveStrength), _metalness(p_metalness), _roughness(p_roughness), _transmitness(p_transmitness), _anisotropy(p_anisotropy), _absorptionColor(p_absorptionColor), _absorptionDensity(p_absorptionDensity), _ior(p_ior) { }
         ~Material() {}
 
         inline const float getIOR() const { return _ior; }
         inline const Vec3f getEmissivity() const { return _emissiveColor*_emissiveStrength; }   
         inline const Vec3f getAbsoptivity(float p_d) const { return glm::pow(_absorptionColor,Vec3f(_absorptionDensity)/glm::max(1e-5f,p_d)); }      
 
-        Vec3f evaluateBSDF(const Vec3f& V, const Vec3f& N, const Vec3f& L, float p_ni, float p_no, float& p_pdf) {
+        Vec3f evaluateBSDF(const Vec3f& V, const Vec3f& N, const Vec3f& T, const Vec3f& B, const Vec3f& L, float p_ni, float p_no, float& p_pdf) {
             Vec3f baseColor = Vec3f(_albedo);
             float alpha = _albedo.a;
             
             float roughness = glm::clamp(_roughness, 0.04f, 0.999f);
-            float r = roughness * roughness;
-            // float rx = glm::max(r*(1.f+anisotropy), 0.001);
-            // float ry = glm::max(r*(1.f-anisotropy), 0.001);
-            float r2 = r * r;
+            float r = roughness * roughness; //float r2 = r * r;
+            float rt = glm::max(0.0016f, r*(1.f+_anisotropy));
+            float rb = glm::max(0.0016f, r*(1.f-_anisotropy));
             
             Vec3f H = (glm::dot(N, L)<0.f) ? -(p_no * V + p_ni * L) : V + L;
             if(glm::dot(H,H)==0.f) H = V;
@@ -46,6 +45,13 @@ namespace RT_CPU
             float cosNH = glm::clamp(glm::dot(N, H), 0.f, 1.f-1e-10f);
             float cosHV = glm::max(0.f, glm::dot(H, V));
             float DielF = schlick(fresnel(p_ni, p_no), 1.f, cosHV);
+            
+            float cosTL = glm::dot(T,L);
+            float cosTV = glm::dot(T,V);
+            float cosBL = glm::dot(B,L);
+            float cosBV = glm::dot(B,V);
+            float cosBH = glm::dot(B,H);
+            float cosTH = glm::dot(T,H);
 
             float diffuseRate = (1.f - _metalness) * (1.f - _transmitness);
             float specularReflectionRate = DielF;
@@ -54,24 +60,20 @@ namespace RT_CPU
 
             if(glm::dot(N,L)<0.f){
                 float cosNL = glm::max(0.f, glm::dot(-N, L));
-                float cosHL = glm::max(0.f, glm::dot(-H, L));               
+                float cosHL = glm::max(0.f, glm::dot(-H, L));     
 
                 // ------------ SPECULAR REFRACTION ------------
-                float D = r2/glm::max(1e-10f,(PIf*pow2((cosNH*cosNH)*(r2-1.f)+1.f)));
-                //float D = 1.f/glm::max(1e-10f,(PIf*rx*ry*pow2(pow2(cosHT/rx)+pow2(cosHB/ry)+cosNH*cosNH)));
-                
-                float XL = glm::sqrt(r2 + (1.f - r2) * cosNL * cosNL); // glm::sqrt(rx*rx*cosLT*cosLT + ry*ry*cosLB*cosLB + cosNL*cosNL)
+                float D = 1.f/glm::max(1e-10f,(PIf*rt*rb*pow2(pow2(cosTH/rt)+pow2(cosBH/rb)+cosNH*cosNH))); //r2/glm::max(1e-10f, (PIf*pow2((cosNH*cosNH)*(r2-1.f)+1.f)));
+                float XL = glm::sqrt(rt*rt*cosTL*cosTL + rb*rb*cosBL*cosBL + cosNL*cosNL); //glm::sqrt(r2 + (1.f-r2) * cosNL * cosNL);
+                float XV = glm::sqrt(rt*rt*cosTV*cosTV + rb*rb*cosBV*cosBV + cosNV*cosNV); //glm::sqrt(r2 + (1.f-r2) * cosNV * cosNV);
                 float G1L = 2.f * cosNL / glm::max(1e-5f, (cosNL + XL));
-                //float G2 = 2.f * cosNL * cosNV / glm::max(1e-5f, (cosNV * XL + cosNL * XV));
-                float V2 = 2.f/glm::max(1e-5f,(cosNL*glm::sqrt(r2+(1.f-r2)*cosNV*cosNV) + cosNV*glm::sqrt(r2+(1.f-r2)*cosNL*cosNL))); // max ?
-                //float V2 = 2.f/glm::max(1e-5f, cosNL*glm::sqrt(rx*rx*cosVT*cosVT + ry*ry*cosVB*cosVB + cosNV*cosNV) + cosNV*glm::sqrt(rx*rx*cosLT*cosLT + ry*ry*cosLB*cosLB + cosNL*cosNL) );
-                
+                float V2 = 2.f/glm::max(1e-5f, cosNL*XV + cosNV*XL);
+
                 Vec3f specularRefraction = glm::sqrt(baseColor) * (1.f-DielF) * D * V2 * cosHL * cosHV / pow2(cosHV + (p_no/p_ni)*cosHL);
                 float pdfSpecularRefraction = D * G1L * cosHV * cosHL * pow2(p_no/p_ni) / glm::max(1e-5f,(cosNV*pow2(cosHV+(p_no/p_ni)*cosHL)));
 
                 // (_alphaCutoff!=0.f && !(_alphaCutoff==1.f && randomFloat()<alpha) && _alphaCutoff>=alpha)
                 p_pdf = (pdfSpecularRefraction*specularRefractionRate)/totalRate;
-                //if(glm::dot(-H, L) <=0.f) std::cout << "dotHL : " << glm::dot(-H, L) << std::endl;
 
                 return alpha * (specularRefraction*specularRefractionRate) / totalRate * cosNL;
             }
@@ -82,23 +84,21 @@ namespace RT_CPU
             // ------------ SPECULAR REFLECTION ------------
             Vec3f f0 = glm::mix(VEC3F_ONE, baseColor, _metalness);
             Vec3f F = schlick(f0, VEC3F_ONE, cosHV);
-            
-            float D = r2 / glm::max(1e-10f, (PIf * pow2((cosNH * cosNH) * (r2 - 1.f) + 1.f)));
-            //float D = 1.f/glm::max(1e-10f,(PIf*rx*ry*pow2(pow2(cosHT/rx)+pow2(cosHB/ry)+cosNH*cosNH)));
-            
-            float XV = glm::sqrt(r2 + (1.f - r2) * cosNV * cosNV); // glm::sqrt(rx*rx*cosVT*cosVT + ry*ry*cosVB*cosVB + cosNV*cosNV)
+            float D = 1.f/glm::max(1e-10f,(PIf*rt*rb*pow2(pow2(cosTH/rt)+pow2(cosBH/rb)+cosNH*cosNH))); //r2/glm::max(1e-10f, (PIf*pow2((cosNH*cosNH)*(r2-1.f)+1.f)));
+            float XL = glm::sqrt(rt*rt*cosTL*cosTL + rb*rb*cosBL*cosBL + cosNL*cosNL); //glm::sqrt(r2 + (1.f-r2) * cosNL * cosNL);
+            float XV = glm::sqrt(rt*rt*cosTV*cosTV + rb*rb*cosBV*cosBV + cosNV*cosNV); //glm::sqrt(r2 + (1.f-r2) * cosNV * cosNV);
             float G1V = 2.f * cosNV / glm::max(1e-5f, (cosNV + XV));
-            float V2 = 0.5f / glm::max(1e-5f, (cosNL * glm::sqrt(r2 + (1.f - r2) * cosNV * cosNV) + cosNV * glm::sqrt(r2 + (1.f - r2) * cosNL * cosNL))); // max ?
-            //float V2 = 0.5f/glm::max(1e-5f, cosNL*glm::sqrt(rx*rx*cosVT*cosVT + ry*ry*cosVB*cosVB + cosNV*cosNV) + cosNV*glm::sqrt(rx*rx*cosLT*cosLT + ry*ry*cosLB*cosLB + cosNL*cosNL) );
+            float V2 = 0.5f/glm::max(1e-5f, cosNL*XV + cosNV*XL);
             
             Vec3f specularReflection = F * D * V2;
             float pdfSpecularReflection = D * G1V / (4.f*cosNV);
 
             // ------------ DIFFUSE ------------
-            float Rr = r * 2.f * cosHL * cosHL + 0.5f;
-            float Fl = pow5(1.f - cosNL);
-            float Fv = pow5(1.f - cosNV);
-            Vec3f diffuse = baseColor * ((1.f - 0.5f * Fl) * (1.f - 0.5f * Fv) + Rr * (Fl + Fv + Fl * Fv * (Rr - 1.f))) * INV_PIf;
+            float Rr = 2.f*r * cosHL*cosHL + 0.5f;
+            float Fl = pow5(1.f-cosNL);
+            float Fv = pow5(1.f-cosNV);
+
+            Vec3f diffuse = baseColor * ((1.f-0.5f*Fl) * (1.f-0.5f*Fv) + Rr*(Fl+Fv+Fl*Fv*(Rr-1.f))) * INV_PIf;
             float pdfDiffuse = cosNL * INV_PIf;
 
             // (_alphaCutoff!=0.f && !(_alphaCutoff==1.f && randomFloat()<alpha) && _alphaCutoff>=alpha)
@@ -112,22 +112,26 @@ namespace RT_CPU
             float alpha = _albedo.a;
 
             float roughness = glm::clamp(_roughness, 0.04f, 0.999f);
-            float r = roughness * roughness;
-            //float rx = glm::max(r*(1.f+anisotropy), 0.001);
-            //float ry = glm::max(r*(1.f-anisotropy), 0.001);
-            float r2 = r * r;
-
+            float r = roughness * roughness; //float r2 = r * r;
+            float rt = glm::max(0.0016f, r*(1.f+_anisotropy));
+            float rb = glm::max(0.0016f, r*(1.f-_anisotropy));
+            
             Vec3f V = -p_ray.getDirection();
             Vec3f N = p_hitRecord._normal;
+            Vec3f T = p_hitRecord._tangent;
+            Vec3f B = p_hitRecord._bitangent;
             Vec3f H = sampleGGXVNDF(V,N,r,r);
 
             float cosNV = glm::max(1e-5f, glm::abs(glm::dot(N, V)));
             float cosHV = glm::max(0.f, glm::dot(H, V));
             float DielF = schlick(fresnel(p_ni, p_no), 1.f, cosHV);
+            
+            float cosTV = glm::dot(T, V);
+            float cosBV = glm::dot(B, V);
 
             float diffuseRate = (1.f-_metalness) * (1.f-_transmitness);
             float specularReflectionRate = DielF;
-            float specularRefractionRate = _transmitness * (1.f - _metalness) * (1.f - DielF);
+            float specularRefractionRate = _transmitness * (1.f-_metalness) * (1.f-DielF);
             float GlobalRate = randomFloat();
                         
             // --- alpha ---
@@ -145,9 +149,11 @@ namespace RT_CPU
                     refractRay.offset(-p_hitRecord._normal);
 
                     float cosNL = glm::max(0.f, glm::dot(-N, refractRay.getDirection()));
-
-                    float XL = glm::sqrt(r2 + (1.f-r2) * cosNL * cosNL);  // glm::sqrt(rx*rx*cosLT*cosLT + ry*ry*cosLB*cosLB + cosNL*cosNL)
-                    float XV = glm::sqrt(r2 + (1.f-r2) * cosNV * cosNV);  // glm::sqrt(rx*rx*cosVT*cosVT + ry*ry*cosVB*cosVB + cosNV*cosNV)
+                    float cosTL = glm::dot(T, refractRay.getDirection());
+                    float cosBL = glm::dot(B, refractRay.getDirection());
+                    
+                    float XL = glm::sqrt(rt*rt*cosTL*cosTL + rb*rb*cosBL*cosBL + cosNL*cosNL); //glm::sqrt(r2 + (1.f-r2) * cosNL * cosNL);
+                    float XV = glm::sqrt(rt*rt*cosTV*cosTV + rb*rb*cosBV*cosBV + cosNV*cosNV); //glm::sqrt(r2 + (1.f-r2) * cosNV * cosNV);
                     p_rayColor *= glm::sqrt(baseColor) * (1.f-DielF) * pow2(p_ni/p_no) * cosNV * (cosNL+XL) / (cosNV*XL + cosNL*XV); // sqrt(col) * (1-DielF) * pow2(p_ni/p_no) * G2 / G1L
 
                     return refractRay;
@@ -160,11 +166,13 @@ namespace RT_CPU
                 reflectRay.offset(p_hitRecord._normal);
 
                 float cosNL = glm::max(0.f, glm::dot(N, reflectRay.getDirection()));
+                float cosTL = glm::dot(T, reflectRay.getDirection());
+                float cosBL = glm::dot(B, reflectRay.getDirection());
 
                 Vec3f f0 = glm::mix(VEC3F_ONE, baseColor, _metalness);
                 Vec3f F = schlick(f0, VEC3F_ONE, cosHV);
-                float XL = glm::sqrt(r2 + (1.f-r2) * cosNL * cosNL);  // glm::sqrt(rx*rx*cosLT*cosLT + ry*ry*cosLB*cosLB + cosNL*cosNL)
-                float XV = glm::sqrt(r2 + (1.f-r2) * cosNV * cosNV);  // glm::sqrt(rx*rx*cosVT*cosVT + ry*ry*cosVB*cosVB + cosNV*cosNV)
+                float XL = glm::sqrt(rt*rt*cosTL*cosTL + rb*rb*cosBL*cosBL + cosNL*cosNL); //glm::sqrt(r2 + (1.f-r2) * cosNL * cosNL);
+                float XV = glm::sqrt(rt*rt*cosTV*cosTV + rb*rb*cosBV*cosBV + cosNV*cosNV); //glm::sqrt(r2 + (1.f-r2) * cosNV * cosNV);
                 p_rayColor *= F * cosNL * (cosNV+XV) / (cosNV*XL + cosNL*XV); // F * G2 / G1V
                 
                 return reflectRay; 
@@ -177,11 +185,11 @@ namespace RT_CPU
             float cosNL = glm::max(0.f, glm::dot(N, diffuseRay.getDirection()));
             float cosHL = glm::max(0.f, glm::dot(glm::normalize(diffuseRay.getDirection() + V), diffuseRay.getDirection()));
 
-            float Rr = r * 2.f * cosHL * cosHL + 0.5f;
-            float Fl = pow5(1.f - cosNL);
-            float Fv = pow5(1.f - cosNV);
+            float Rr = 2.f*r * cosHL*cosHL + 0.5f;
+            float Fl = pow5(1.f-cosNL);
+            float Fv = pow5(1.f-cosNV);
 
-            p_rayColor *= baseColor * ((1.f - 0.5f * Fl) * (1.f - 0.5f * Fv) + Rr * (Fl + Fv + Fl * Fv * (Rr - 1.f)));
+            p_rayColor *= baseColor * ((1.f-0.5f*Fl) * (1.f-0.5f*Fv) + Rr*(Fl+Fv + Fl*Fv*(Rr-1.f)));
 
             return diffuseRay;
         }
@@ -241,7 +249,7 @@ namespace RT_CPU
         //Vec3f _sheenColor             = VEC3F_ONE;
 
         // https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_materials_anisotropy/README.md
-        //float _anisotropy             = 0.f; // [-1;1]    // compute with the two parameterers ?
+        float _anisotropy               = 0.f;          // [-1;1]
 
         Vec3f _absorptionColor          = VEC3F_ONE;    // [0;1] => rgb
         float _absorptionDensity        = 0.f;          // [0;+inf[ => atDistance

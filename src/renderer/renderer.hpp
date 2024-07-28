@@ -98,7 +98,7 @@ namespace RT_CPU
 
 							if (!p_scene.intersectAny(shadowRay, p_near, lightSample._distance-p_near)){ // for alpha should return true or false + quantity of shadow ?
 								float bsdfPdf = 1.f;
-								Vec3f bsdfValue = hitRecord._mesh->getMaterial()->evaluateBSDF(-currentRay.getDirection(), hitRecord._normal, lightSample._direction, ni, no, bsdfPdf);
+								Vec3f bsdfValue = hitRecord._mesh->getMaterial()->evaluateBSDF(-currentRay.getDirection(), hitRecord._normal, hitRecord._tangent, hitRecord._bitangent, lightSample._direction, ni, no, bsdfPdf);
 								lightRadiosity += lightSample._radiance * bsdfValue * lightSample._pdf/(lightSample._pdf*lightSample._pdf+bsdfPdf*bsdfPdf); // power heuristic 
 							}
 						}

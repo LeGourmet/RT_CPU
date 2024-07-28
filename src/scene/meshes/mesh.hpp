@@ -23,12 +23,19 @@ namespace RT_CPU
 		virtual bool intersectAny(const Ray& p_ray, const float ptMin, const float p_tMax) const = 0;
 
 	protected:
+		// https://marti.works/posts/post-calculating-tangents-for-your-mesh/post/
 		inline void _hitRegister(HitRecord& p_hitRecord, const Ray& p_ray, Vec3f p_point, Vec3f p_normal, float p_t) const {
 			p_hitRecord._point = p_point;
 			p_hitRecord._normal = p_normal;
 			p_hitRecord.faceNormal(p_ray.getDirection());
 			p_hitRecord._distance = p_t;
 			p_hitRecord._mesh = this;
+
+			float s = (p_hitRecord._normal.z >= 0.) ? 1.f : -1.f;
+			float a = -1.f / (s + p_hitRecord._normal.z);
+			float b = p_hitRecord._normal.x * p_hitRecord._normal.y * a;
+			p_hitRecord._tangent = Vec3f(1.f + s * p_hitRecord._normal.x * p_hitRecord._normal.x * a, s * b, -s * p_hitRecord._normal.x);
+			p_hitRecord._bitangent = Vec3f(b, s + p_hitRecord._normal.y * p_hitRecord._normal.y * a, -p_hitRecord._normal.y);
 		}
 
 	protected:

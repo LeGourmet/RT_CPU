@@ -29,8 +29,8 @@
 
 #include "scene/lights/basic/ponctual_light.hpp"
 #include "scene/lights/basic/directional_light.hpp"
-#include "scene/lights/surfacic/quad_light.hpp"
-#include "scene/lights/surfacic/disk_light.hpp"
+#include "scene/lights/planar/quad_light.hpp"
+#include "scene/lights/planar/disk_light.hpp"
 #include "scene/lights/volumic/sphere_light.hpp"
 
 #include <iostream>
@@ -40,14 +40,14 @@ namespace RT_CPU
 	Scene::Scene(const Image& p_image, unsigned int p_id) {
 		float aspectRatio = float(p_image.getWidth()) / float(p_image.getHeight());
 		
-		// material test
-		// fractal test	
-		// infinit fractal test
-		// implicit test
-		// triangle mesh test
-		// micro mesh test
-		// lights test
-		// camera test
+		// test camera => perspective, ortho, fisheye, panoramic
+		// test light  => envmap, quad, disk, cylinder, sphere, sun
+		// material
+		// test micro-mesh
+		// test implicit
+		// test fractale
+		// test infinit fractal
+		// test parametric
 
 		if(p_id==0){ // material test
 			_camera = new CameraPerspective(Vec3f(0.f, -8.f, 16.f), Vec3f(0.f, -1.f, 2.f), PIf / 3.f, 1.f, aspectRatio);
@@ -55,7 +55,7 @@ namespace RT_CPU
 			_lights.push_back(new PonctualLight(Vec3f(0.f, 0.f, 50.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 10000.f, -PIf, -PIf));
 			
 			_meshes.push_back(new Plane(Vec3f(0.f, 0.f, 0.f), Vec3f(0., 0., 1.f)));
-			_materials.push_back(new Material(Vec4f(0.5f, 0.5f, 0.5f, 1.f), 0.f, VEC3F_ZERO, 0.f, 0.f, 1.f, 0.f, VEC3F_ZERO, 0.f, 1.f));
+			_materials.push_back(new Material(Vec4f(0.5f, 0.5f, 0.5f, 1.f), 0.f, VEC3F_ZERO, 0.f, 0.f, 1.f, 0.f, 0.f, VEC3F_ZERO, 0.f, 1.f));
 
 			//_meshes.push_back(new Sphere(Vec3f(0.f, 0.f, 100.f), 10.f));
 			//_materials.push_back(new Material(VEC4F_ONE, 0.f, VEC3F_ONE, 100.f, 0.f, 1.f, 0.f, VEC3F_ZERO, 0.f, 1.f));
@@ -66,49 +66,50 @@ namespace RT_CPU
 				//_meshes.push_back(new Sphere(Vec3f(-10.f + i * 2.5f, -10.f, 2.f), 1.f));
 				
 				// Dielectric
-				_materials.push_back(new Material(Vec4f(randomFloat(), randomFloat(), randomFloat(), 1.f), 0.f, VEC3F_ZERO, 0.f, 0.f, i*0.125f, 0.f, VEC3F_ZERO, 0.f, 1.5f));
+				_materials.push_back(new Material(Vec4f(randomFloat(), randomFloat(), randomFloat(), 1.f), 0.f, VEC3F_ZERO, 0.f, 0.f, i*0.125f, 0.f, 0.f, VEC3F_ZERO, 0.f, 1.5f));
 				_meshes.push_back(new Sphere(Vec3f(-10.f + i * 2.5f, -7.5f, 2.f), 1.f));
 				
 				// Metalic
-				_materials.push_back(new Material(Vec4f(randomFloat(), randomFloat(), randomFloat(), 1.f), 0.f, VEC3F_ZERO, 0.f, 1.f, i*0.125f, 0.f, VEC3F_ZERO, 0.f, 1.5f));
+				_materials.push_back(new Material(Vec4f(randomFloat(), randomFloat(), randomFloat(), 1.f), 0.f, VEC3F_ZERO, 0.f, 1.f, i*0.125f, 0.f, 0.f, VEC3F_ZERO, 0.f, 1.5f));
 				_meshes.push_back(new Sphere(Vec3f(-10.f + i * 2.5f, -5.f, 2.f), 1.f));
 
 				// Metalic Anisotropie
-				//_materials.push_back(new Material(Vec3f(randomFloat(), randomFloat(), randomFloat()), VEC3F_ZERO, 0.f, 1.f, i*0.125f, 0.f, VEC3F_ZERO, 0.f, 1.5f));
-				//_meshes.push_back(new Sphere(Vec3f(-10.f + i * 2.5f, -2.5f, 2.f), 1.f));
+				_materials.push_back(new Material(Vec4f(randomFloat(), randomFloat(), randomFloat(), 1.f), 0.f, VEC3F_ZERO, 0.f, 1.f, 0.f, 0.f, -1.f+i*0.25f, VEC3F_ZERO, 0.f, 1.5f));
+				_meshes.push_back(new Sphere(Vec3f(-10.f + i * 2.5f, -2.5f, 2.f), 1.f));
 
 				// Clear Coat
 				//_materials.push_back(new Material(Vec3f(randomFloat(), randomFloat(), randomFloat()), VEC3F_ZERO, 0.f, 1.f, 0.6f, 0.f, VEC3F_ZERO, 0.f, 1.5f));
 				//_meshes.push_back(new Sphere(Vec3f(-10.f + i * 2.5f, 0.f, 2.f), 1.f));
 				
 				// Alpha
-				_materials.push_back(new Material(Vec4f(randomFloat(), randomFloat(), randomFloat(), i*0.125f), 1.f, VEC3F_ZERO, 0.f, 0.5f, 0.2f, 0.f, VEC3F_ZERO, 0.f, 1.5f));
+				_materials.push_back(new Material(Vec4f(randomFloat(), randomFloat(), randomFloat(), i*0.125f), 1.f, VEC3F_ZERO, 0.f, 0.5f, 0.2f, 0.f, 0.f, VEC3F_ZERO, 0.f, 1.5f));
 				_meshes.push_back(new Sphere(Vec3f(-10.f + i * 2.5f, 2.5f, 2.f), 1.f));
 
 				// Transparent
-				_materials.push_back(new Material(Vec4f(randomFloat(), randomFloat(), randomFloat(), 1.f), 0.f, VEC3F_ZERO, 0.f, 0.f, i*0.125f, 1.f, VEC3F_ZERO, 0.f, 1.5f));
+				_materials.push_back(new Material(Vec4f(randomFloat(), randomFloat(), randomFloat(), 1.f), 0.f, VEC3F_ZERO, 0.f, 0.f, i*0.125f, 1.f, 0.f, VEC3F_ZERO, 0.f, 1.5f));
 				_meshes.push_back(new Sphere(Vec3f(-10.f + i * 2.5f, 5.f, 2.f), 1.f));
 
 				// Absorbance
-				_materials.push_back(new Material(Vec4f(1.f,1.f,1.f,1.f), 0.f, VEC3F_ZERO, 0.f, 0.f, 0.f, 1.f, Vec3f(0.9f, 0.3f, 0.3f), i * 1.f, 1.5f));
+				_materials.push_back(new Material(Vec4f(1.f,1.f,1.f,1.f), 0.f, VEC3F_ZERO, 0.f, 0.f, 0.f, 1.f, 0.f, Vec3f(0.9f, 0.3f, 0.3f), i * 1.f, 1.5f));
 				_meshes.push_back(new Sphere(Vec3f(-10.f + i * 2.5f, 7.5f, 2.f), 1.f));
 
 				// Emissive
-				_materials.push_back(new Material(Vec4f(1.f, 1.f, 1.f, 1.f), 0.f, Vec3f(randomFloat(), randomFloat(), randomFloat()), i*2.5f, 0.f, 1.f, 0.f, VEC3F_ZERO, 0.f, 1.5f));
+				_materials.push_back(new Material(Vec4f(1.f, 1.f, 1.f, 1.f), 0.f, Vec3f(randomFloat(), randomFloat(), randomFloat()), i*2.5f, 0.f, 1.f, 0.f, 0.f, VEC3F_ZERO, 0.f, 1.5f));
 				_meshes.push_back(new Sphere(Vec3f(-10.f + i * 2.5f, 10.f, 2.f), 1.f));
 			}
 
 			for(int i=0; i<_meshes.size() ;i++) _meshes[i]->setMaterial(_materials[i]);
 
-		}else if (p_id == 1) { // fractal test
+		}
+		else if (p_id == 1) { // fractal test
 			_camera = new CameraPerspective(Vec3f(0.f, -4.f, 3.f), Vec3f(0.f, 0.f, 1.f), PIf / 3.f, 1.f, aspectRatio);
 
-			_materials.push_back(new Material(Vec4f(1.f, 1.f, 1.f, 1.f), 0.f, VEC3F_ONE , 5.f, 0.f, 1.f, 0.f, VEC3F_ZERO, 0.f, 1.f));
-			_materials.push_back(new Material(Vec4f(1.f, 1.f, 1.f, 1.f), 0.f, VEC3F_ZERO, 0.f, 1.f, 1.f, 0.f, VEC3F_ZERO, 0.f, 1.f));
-			_materials.push_back(new Material(Vec4f(1.f, 0.f, 0.f, 1.f), 0.f, VEC3F_ZERO, 0.f, 1.f, 1.f, 0.f, VEC3F_ZERO, 0.f, 1.f));
-			_materials.push_back(new Material(Vec4f(0.f, 1.f, 0.f, 1.f), 0.f, VEC3F_ZERO, 0.f, 1.f, 1.f, 0.f, VEC3F_ZERO, 0.f, 1.f));
-			_materials.push_back(new Material(Vec4f(0.8f, 0.235f, 0.f, 1.f), 0.f, VEC3F_ZERO, 0.f, 1.f, 0.5f, 0.f, VEC3F_ZERO, 0.f, 1.f));
-			_materials.push_back(new Material(Vec4f(0.f, 0.235f, 0.8f, 1.f), 0.f, VEC3F_ZERO, 0.f, 1.f, 0.5f, 0.f, VEC3F_ZERO, 0.f, 1.f));
+			_materials.push_back(new Material(Vec4f(1.f, 1.f, 1.f, 1.f), 0.f, VEC3F_ONE , 5.f, 0.f, 1.f, 0.f, 0.f, VEC3F_ZERO, 0.f, 1.f));
+			_materials.push_back(new Material(Vec4f(1.f, 1.f, 1.f, 1.f), 0.f, VEC3F_ZERO, 0.f, 1.f, 1.f, 0.f, 0.f, VEC3F_ZERO, 0.f, 1.f));
+			_materials.push_back(new Material(Vec4f(1.f, 0.f, 0.f, 1.f), 0.f, VEC3F_ZERO, 0.f, 1.f, 1.f, 0.f, 0.f, VEC3F_ZERO, 0.f, 1.f));
+			_materials.push_back(new Material(Vec4f(0.f, 1.f, 0.f, 1.f), 0.f, VEC3F_ZERO, 0.f, 1.f, 1.f, 0.f, 0.f, VEC3F_ZERO, 0.f, 1.f));
+			_materials.push_back(new Material(Vec4f(0.8f, 0.235f, 0.f, 1.f), 0.f, VEC3F_ZERO, 0.f, 1.f, 0.5f, 0.f, 0.f, VEC3F_ZERO, 0.f, 1.f));
+			_materials.push_back(new Material(Vec4f(0.f, 0.235f, 0.8f, 1.f), 0.f, VEC3F_ZERO, 0.f, 1.f, 0.5f, 0.f, 0.f, VEC3F_ZERO, 0.f, 1.f));
 			
 			_meshes.push_back(new Plane(Vec3f(0.f, 0.f, 10.f), Vec3f(0.f, 0.f, -1.f)));
 			_meshes.push_back(new Plane(Vec3f(0.f, 0.f, 0.f), Vec3f(0.f, 0.f, 1.f)));
@@ -128,24 +129,30 @@ namespace RT_CPU
 			_meshes[6]->setMaterial(_materials[4]);
 			_meshes[7]->setMaterial(_materials[5]);
 
-		} else if (p_id == 2) { // infinite fractal test
+		} 
+		else if (p_id == 2) { // infinite fractal test
 			_camera = new CameraPerspective(Vec3f(-3.f, 1.f, 5.f), Vec3f(-3.f, 0.f, 5.f), PIf / 3.f, 1.f, aspectRatio);
 
-			_materials.push_back(new Material(Vec4f(1.f, 1.f, 1.f, 1.f), 0.f, VEC3F_ONE, 20.f, 0.f, 1.f, 0.f, VEC3F_ZERO, 0.f, 1.f));
-			_materials.push_back(new Material(Vec4f(0.35f, 0.2f, 0.05f, 1.f), 0.f, VEC3F_ZERO, 0.f, 0.75f, 0.5f, 0.f, VEC3F_ZERO, 0.f, 1.f));
+			_materials.push_back(new Material(Vec4f(1.f, 1.f, 1.f, 1.f), 0.f, VEC3F_ONE, 20.f, 0.f, 1.f, 0.f, 0.f, VEC3F_ZERO, 0.f, 1.f));
+			_materials.push_back(new Material(Vec4f(0.35f, 0.2f, 0.05f, 1.f), 0.f, VEC3F_ZERO, 0.f, 0.75f, 0.5f, 0.f, 0.f, VEC3F_ZERO, 0.f, 1.f));
 
 			_meshes.push_back(new Plane(Vec3f(0.f, 0.f, 10.f), Vec3f(0.f,0.f,-1.f)));
 			_meshes.push_back(new ApolloniusImplicit(VEC3F_ZERO,1.f));
 
 			for(int i=0; i<_meshes.size() ;i++) _meshes[i]->setMaterial(_materials[i]);
 
-		} else if(p_id == 3) { // triangle mesh test
-			_camera = new CameraPerspective(Vec3f(-3.47f, -1.35f, 1.7f), Vec3f(0.f, 0.f, 0.f), PIf / 3.f, 1.f, aspectRatio);
+		} 
+		else if(p_id == 3) { // triangle mesh test
+			/*_camera = new CameraPerspective(Vec3f(-3.47f, -1.35f, 1.7f), Vec3f(0.f, 0.f, 0.f), PIf / 3.f, 1.f, aspectRatio);
 			_lights.push_back(new QuadLight(Vec3f(0.f, 0.f, 2.8f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 2.5f, Vec3f(4.f, 0.f, 0.f), Vec3f(0.f, 4.f, 0.f)));
 			//_lights.push_back(new PonctualLight(Vec3f(0.f, 0.f, 2.8f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 30.f, -PIf, -PIf));
 			_materials.push_back(new Material(Vec4f(0.5f, 0.5f, 0.5f, 1.f), 0.f, VEC3F_ZERO, 0.f, 0.f, 1.f, 0.f, VEC3F_ZERO, 0.f, 1.f));
-			_loadGltf("assets/conference_dragon_and_bunny.glb");
-		} else if (p_id == 4) {
+			_loadGltf("assets/conference_dragon_and_bunny.glb");*/
+			_camera = new CameraPerspective(Vec3f(0.f, -7.f, 3.5f), Vec3f(0.f, -6.f, 3.f), PIf / 3.f, 1.f, aspectRatio);
+			_materials.push_back(new Material(Vec4f(0.5f, 0.5f, 0.5f, 1.f), 0.f, VEC3F_ZERO, 0.f, 0.f, 1.f, 0.f, 0.f, VEC3F_ZERO, 0.f, 1.f));
+			_loadGltf("assets/demo.glb");
+		} 
+		else if (p_id == 4) {
 			//_camera = new CameraPerspective(Vec3f(0.f, -2.f, 2.f), Vec3f(0.f, 0.f, 1.f), PIf / 3.f, 1.f, aspectRatio);
 
 			_camera = new CameraPerspective(Vec3f(0.f, -9.f, 9.f), Vec3f(0.f, -2.f, 2.f), PIf / 3.f, 1.f, aspectRatio);
@@ -154,20 +161,20 @@ namespace RT_CPU
 			//_camera = new CameraFisheye(Vec3f(0.f, -8.f, 8.f), Vec3f(0.f, -2.f, 2.f), 1.f);
 
 			_meshes.push_back(new Plane(Vec3f(0.f, 0.f, 0.f), Vec3f(0., 0., 1.f)));
-			_materials.push_back(new Material(Vec4f(0.5f, 0.5f, 0.5f, 1.f), 0.f, VEC3F_ZERO, 0.f, 0.f, 1.f, 0.f, VEC3F_ZERO, 0.f, 1.f));
+			_materials.push_back(new Material(Vec4f(0.5f, 0.5f, 0.5f, 1.f), 0.f, VEC3F_ZERO, 0.f, 0.f, 1.f, 0.f, 0.f, VEC3F_ZERO, 0.f, 1.f));
 
 			//_lights.push_back(new DirectionalLight(Vec3f(0.f, 0.f, 0.f), glm::normalize(Vec3f(0.f,0.f,-1.f)), VEC3F_ONE, 3.f, 0.f));
 			//_lights.push_back(new DirectionalLight(Vec3f(0.f, 0.f, 0.f), glm::normalize(Vec3f(0.f,0.f,-1.f)), VEC3F_ONE, 3.f, PIf/10.f));
-			//_lights.push_back(new PonctualLight(Vec3f(0.f, 0.f, 10.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 300.f, -PIf, -PIf));
+			_lights.push_back(new PonctualLight(Vec3f(0.f, 0.f, 10.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 300.f, -PIf, -PIf));
 			//_lights.push_back(new PonctualLight(Vec3f(0.f, 0.f, 10.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 300.f, PIf/5.f, PIf/3.f));
 			//_lights.push_back(new QuadLight(Vec3f(0.f, 0.f, 10.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 20.f, Vec2f(4.f,0.f), Vec2f(0.f,4.f)));
 			//_lights.push_back(new DiskLight(Vec3f(0.f, 0.f, 10.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 25.f, 2.f));
 			//_lights.push_back(new SphereLight(Vec3f(0.f, 0.f, 10.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 3.f, 4.f, -PIf, -PIf));
-			_lights.push_back(new SphereLight(Vec3f(0.f, 0.f, 10.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 3.f, 4.f, PIf/5.f, PIf/3.f));
+			//_lights.push_back(new SphereLight(Vec3f(0.f, 0.f, 10.f), glm::normalize(Vec3f(0.f, 0.f, -1.f)), VEC3F_ONE, 3.f, 4.f, PIf/5.f, PIf/3.f));
 
 			for (int i = 0; i < 5; i++)
 				for (int j = 0; j < 5; j++) {
-					_materials.push_back(new Material(Vec4f(randomFloat(), randomFloat(), randomFloat(), 1.f), 0.f, VEC3F_ZERO, 0.f, 1.f, 0.1f, 0.f, VEC3F_ZERO, 0.f, 1.5f));
+					_materials.push_back(new Material(Vec4f(randomFloat(), randomFloat(), randomFloat(), 1.f), 0.f, VEC3F_ZERO, 0.f, 1.f, 0.1f, 0.f, 0.f, VEC3F_ZERO, 0.f, 1.5f));
 					_meshes.push_back(new Sphere(Vec3f(-5.f + i * 2.5f, -5.f + j * 2.5f, 2.f), 1.f));
 				}
 
@@ -239,6 +246,7 @@ namespace RT_CPU
 				(float)m.pbrData.metallicFactor,
 				(float)m.pbrData.roughnessFactor,
 				((m.transmission.get() == nullptr) ? 0.f : (float)m.transmission.get()->transmissionFactor),
+				0.f,
 				((m.volume.get() == nullptr) ? VEC3F_ONE : glm::make_vec3(m.volume.get()->attenuationColor.data())),
 				((m.volume.get() == nullptr) ? FLT_MAX : (float)m.volume.get()->attenuationDistance),
 				(float)m.ior

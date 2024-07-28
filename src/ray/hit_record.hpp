@@ -13,6 +13,8 @@ namespace RT_CPU
 
 		Vec3f			_point		= VEC3F_ZERO;
 		Vec3f			_normal		= VEC3F_Z;
+		Vec3f			_tangent	= VEC3F_Y;
+		Vec3f			_bitangent	= VEC3F_X; 
 		float			_distance	= FLOAT_MAX;
 		const Mesh*		_mesh		= nullptr;
 	};

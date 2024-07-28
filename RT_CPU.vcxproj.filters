@@ -74,13 +74,13 @@
     <ClInclude Include="src\scene\lights\basic\ponctual_light.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="src\scene\lights\surfacic\quad_light.hpp">
+    <ClInclude Include="src\scene\lights\planar\quad_light.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="src\scene\lights\volumic\sphere_light.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="src\scene\lights\surfacic\surfacic_light.hpp">
+    <ClInclude Include="src\scene\lights\planar\planar_light.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="src\scene\lights\basic\basic_light.hpp">
@@ -98,7 +98,7 @@
     <ClInclude Include="src\scene\lights\volumic\cylinder_light.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="src\scene\lights\surfacic\disk_light.hpp">
+    <ClInclude Include="src\scene\lights\planar\disk_light.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="src\renderer\renderer.hpp">

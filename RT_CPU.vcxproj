@@ -177,10 +177,10 @@
     <ClInclude Include="src\scene\lights\light.hpp" />
     <ClInclude Include="src\scene\lights\light_sample.hpp" />
     <ClInclude Include="src\scene\lights\volumic\cylinder_light.hpp" />
-    <ClInclude Include="src\scene\lights\surfacic\disk_light.hpp" />
-    <ClInclude Include="src\scene\lights\surfacic\quad_light.hpp" />
+    <ClInclude Include="src\scene\lights\planar\disk_light.hpp" />
+    <ClInclude Include="src\scene\lights\planar\quad_light.hpp" />
     <ClInclude Include="src\scene\lights\volumic\sphere_light.hpp" />
-    <ClInclude Include="src\scene\lights\surfacic\surfacic_light.hpp" />
+    <ClInclude Include="src\scene\lights\planar\planar_light.hpp" />
     <ClInclude Include="src\accelerators\aabb.hpp" />
     <ClInclude Include="src\scene\lights\volumic\volumic_light.hpp" />
     <ClInclude Include="src\scene\meshes\geometry\analytic\micro_mesh.hpp" />
