@@ -26,6 +26,7 @@ namespace RT_CPU
         inline const float getIOR() const { return _ior; }
         inline const Vec3f getEmissivity() const { return _emissiveColor*_emissiveStrength; }   
         inline const Vec3f getAbsoptivity(float p_d) const { return glm::pow(_absorptionColor,Vec3f(_absorptionDensity)/glm::max(1e-5f,p_d)); }      
+        //const Vec3f getAbsoptivity(float p_d) const { return glm::exp(-(1.f-_absorptionColor)/glm::max(1e-5f,_absorptionDensity) * p_d);}
 
         Vec3f evaluateBSDF(const Vec3f& V, const Vec3f& N, const Vec3f& T, const Vec3f& B, const Vec3f& L, float p_ni, float p_no, float& p_pdf) {
             Vec3f baseColor = Vec3f(_albedo);
