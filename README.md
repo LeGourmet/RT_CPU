@@ -98,9 +98,11 @@ Autres :
 
 Un refactor complet du moteur est en cours dans le but d'ajouter en plus de tout ça, une preview qui s'actualise en temps réèle et une UI qui permet de simplifier la mise en pace des rendu.
 
-| UI | Intel Sponza  |
+| | |
 | - | - |
-| ![UI](results/RT_lite/UI.png) | ![Intel Sponza](results/RT_lite/IntelSponza_13M.png) |
+| Demo Scene | ![Demo](results/RT_lite/path_4096spp.png) |
+| Intel Sponza | ![Intel Sponza](results/RT_lite/IntelSponza_13M.png) |
+| UI | ![UI](results/RT_lite/UI.png) |
 
 # Bugs
 
