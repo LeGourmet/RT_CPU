@@ -50,7 +50,7 @@ D'autres améliorations ont aussi été réalisées comme :
 
 | Mandelbulb and julia set | Appolonius |
 | - | - |
-| ![Fractal1](results/fractal.png) | ![Fractal2](results/appolonius.png) |
+| ![Fractal1](results/fractals/fractal.png) | ![Fractal2](results/fractals/appolonius.png) |
 
 | Roughness | Dielectric | Metalic | Transmit |
 | - | - | - | - |
@@ -78,10 +78,6 @@ Des modifications au niveau des objets peuplant la scène sont à prévoir :
 - le refactor des light intensity pour correspondre à des watts ou des lumens
 - la gestion de l'instancing
 - la création et gestion d'un graph de scène
-- l'ajout d'objets de type speakers (pour une potentiel future prise en compte du son)
-- l'ajout d'objets de type force field (pour une potentiel simulation du vent)
-- la prise en compte des bones and rigging des objets (potentiel prise en compte des mouvements)
-- la prise en compte des animations des objets (avec un chrono fonctionel, pour un potentiel prise en comte des animations)
 
 Des modifictions au niveau du materiaux de l'objets sont à venir:
 - Ajout d'une couche de clearCoat / Coat
@@ -101,7 +97,6 @@ Autres :
 - l'ajout d'une interface
 - portage sur GPU et utilisation d'embree pour la partie CPU ?
 - l'ajout d'une interface graphique
-- fusion avec les moteurs RT_ISICG, RT_SDF et RT_Lite
 - l'ajout d'effets de post-processing (AgX, denoiser)
 
 # Bugs
