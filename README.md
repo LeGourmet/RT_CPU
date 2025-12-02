@@ -94,10 +94,13 @@ Autres :
 - l'ajout de support pour les environement map
 - l'ajout d'un type de json descriptif de scene
 - ajout de bidirectional path tracing
-- l'ajout d'une interface
-- portage sur GPU et utilisation d'embree pour la partie CPU ?
-- l'ajout d'une interface graphique
 - l'ajout d'effets de post-processing (AgX, denoiser)
+
+Un refactor complet du moteur est en cours dans le but d'ajouter en plus de tout ça, une preview qui s'actualise en temps réèle et une UI qui permet de simplifier la mise en pace des rendu.
+
+| UI | Intel Sponza  |
+| - | - |
+| ![UI](results/RT_lite/UI.png) | ![Intel Sponza](results/RT_lite/IntelSponza_13M.png) |
 
 # Bugs
 
